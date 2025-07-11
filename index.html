@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Générateur de Combinaisons Poétiques - Créez des poèmes uniques avec l'intelligence artificielle">
+  <meta name="keywords" content="poésie, générateur, combinaisons, art, créativité, éditions Provoq'émois">
+  <meta name="author" content="Les éditions augmentées Provoq'émois">
+  <title>Générateur de Combinaisons Poétiques</title>
+
+  <!-- Liens vers les feuilles de style -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Préchargement de polices pour de meilleures performances -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Bibliothèque jsPDF pour l'export PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+  <!-- Favicon et icônes -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23026773' viewBox='0 0 16 16'%3e%3cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3e%3cpath d='M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z'/%3e%3c/svg%3e">
+</head>
+
+<body>
+  <!-- Skip link pour l'accessibilité -->
+  <a href="#main-content" class="sr-only">Aller au contenu principal</a>
+
+  <div class="container">
+    <header role="banner">
+      <h1>Générateur de Combinaisons Poétiques 🌟</h1>
+      <p class="subtitle">Une création originale des éditions augmentées Provoq'émois</p>
+    </header>
+
+    <main id="main-content" role="main">
+
+      <!-- Section des mots disponibles -->
+      <section class="word-selection" aria-labelledby="word-selection-title">
+        <h2 id="word-selection-title" class="sr-only">Sélection des mots</h2>
+
+        <div id="fullWordList" class="full-word-list" role="group" aria-label="Mots disponibles pour les combinaisons">
+          <span class="word-list-label">Mots disponibles :</span>
+
+          <!-- Groupe de mots style 1 -->
+          <span class="word-group-1" data-word="Je" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : Je">Je</span>
+          <span class="word-group-1" data-word="suis" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : suis">suis</span>
+          <span class="word-group-1" data-word="professionnel" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : professionnel">professionnel</span>
+          <span class="word-group-1" data-word="dans" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : dans">dans</span>
+          <span class="word-group-1" data-word="l'erreur" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : l'erreur">l'erreur</span>
+          <span class="word-group-1" data-word="en" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : en">en</span>
+          <span class="word-group-1" data-word="tout" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : tout">tout</span>
+          <span class="word-group-1" data-word="genre" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : genre">genre</span>
+          <span class="word-group-1" data-word="proscrite" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : proscrite">proscrite</span>
+          <span class="word-group-1" data-word="la" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : la">la</span>
+          <span class="word-group-1" data-word="souveraine" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : souveraine">souveraine</span>
+          <span class="word-group-1" data-word="intelligence" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : intelligence">intelligence</span>
+
+          <!-- Groupe de mots style 2 -->
+          <span class="word-group-2" data-word="rêveur" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : rêveur">rêveur</span>
+          <span class="word-group-2" data-word="mon" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : mon">mon</span>
+          <span class="word-group-2" data-word="métier" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : métier">métier</span>
+          <span class="word-group-2" data-word="exceptionnel" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : exceptionnel">exceptionnel</span>
+          <span class="word-group-2" data-word="est" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : est">est</span>
+          <span class="word-group-2" data-word="pour" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : pour">pour</span>
+          <span class="word-group-2" data-word="moi-même" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : moi-même">moi-même</span>
+          <span class="word-group-2" data-word="grandissant" role="checkbox" aria-checked="true" tabindex="0"
+            aria-label="Mot : grandissant">grandissant</span>
+        </div>
+
+        <div class="selected-words-counter" role="status" aria-live="polite">
+          Mots sélectionnés : <span id="selectedWordsCount">20</span> sur 20
+        </div>
+      </section>
+
+      <!-- Contrôles principaux -->
+      <section class="main-controls" aria-labelledby="controls-title">
+        <h2 id="controls-title" class="sr-only">Contrôles de génération</h2>
+
+        <div class="controls-top">
+          <button id="resetAllWords" class="secondary" type="button"
+            aria-label="Réinitialiser la sélection de tous les mots">
+            <span aria-hidden="true">♻️</span> Réinitialiser tous les mots
+          </button>
+          <button id="toggleSound" class="secondary sound-enabled" type="button"
+            aria-label="Activer ou désactiver les effets sonores" aria-pressed="true">
+            <span aria-hidden="true">🔊</span> Son activé
+          </button>
+        </div>
+
+        <div class="controls">
+          <label for="wordCount" class="control-label">
+            Sélectionne le nombre de mots pour ta combinaison :
+          </label>
+          <select id="wordCount" aria-describedby="wordcount-help">
+            <option value="surprise">Surprise 🎲</option>
+            <option value="1">1 mot</option>
+            <option value="2">2 mots</option>
+            <option value="3" selected>3 mots</option>
+            <option value="4">4 mots</option>
+            <option value="5">5 mots</option>
+            <option value="6">6 mots</option>
+            <option value="7">7 mots</option>
+            <option value="8">8 mots</option>
+            <option value="9">9 mots</option>
+            <option value="10">10 mots</option>
+            <option value="11">11 mots</option>
+            <option value="12">12 mots</option>
+            <option value="13">13 mots</option>
+            <option value="14">14 mots</option>
+            <option value="15">15 mots</option>
+            <option value="16">16 mots</option>
+            <option value="17">17 mots</option>
+            <option value="18">18 mots</option>
+            <option value="19">19 mots</option>
+            <option value="max">Maximum 🌟</option>
+          </select>
+          <div id="wordcount-help" class="sr-only">
+            Choisissez le nombre de mots à utiliser dans votre combinaison poétique
+          </div>
+
+          <div class="generation-buttons" role="group" aria-label="Boutons de génération">
+            <button id="generateBtn" class="primary" type="button" aria-describedby="generate-help">
+              <span aria-hidden="true">✨</span> Générer
+            </button>
+            <button id="generateSelectedBtn" type="button" aria-describedby="generate-selected-help">
+              <span aria-hidden="true">🎯</span> Générer avec mots sélectionnés
+            </button>
+          </div>
+
+          <div id="generate-help" class="sr-only">
+            Génère une combinaison poétique avec le nombre de mots sélectionné
+          </div>
+          <div id="generate-selected-help" class="sr-only">
+            Génère une combinaison en utilisant uniquement les mots que vous avez sélectionnés
+          </div>
+        </div>
+      </section>
+
+      <!-- Zone de résultat -->
+      <section class="result-section" aria-labelledby="result-title">
+        <h2 id="result-title" class="sr-only">Résultat de la génération</h2>
+
+        <div class="result" id="result" role="region" aria-live="polite" aria-atomic="true"
+          aria-label="Combinaison poétique générée" aria-busy="false">
+          <span class="cursor" aria-hidden="true">|</span>
+        </div>
+
+        <div class="button-group" role="group" aria-label="Actions sur la combinaison">
+          <button id="copyBtn" class="secondary" type="button" aria-label="Copier la combinaison dans le presse-papier">
+            <span aria-hidden="true">📋</span> Copier la combinaison
+          </button>
+          <button id="newCombinationBtn" class="secondary" type="button" aria-label="Générer une nouvelle combinaison">
+            <span aria-hidden="true">🔄</span> Nouvelle combinaison
+          </button>
+        </div>
+      </section>
+
+      <!-- Système de notation -->
+      <section class="rating-section" aria-labelledby="rating-title">
+        <div class="rating-container">
+          <h2 id="rating-title">Évaluation de la combinaison ⭐</h2>
+
+          <fieldset class="rating-fieldset">
+            <legend class="rating-label">Note la pertinence de cette combinaison :</legend>
+
+            <div class="rating" id="rating" role="radiogroup" aria-labelledby="rating-title" aria-disabled="true"
+              aria-describedby="rating-help">
+              <input type="radio" id="rate-1" name="rating" value="1" disabled>
+              <label for="rate-1" aria-label="Noter 1 sur 10">1</label>
+
+              <input type="radio" id="rate-2" name="rating" value="2" disabled>
+              <label for="rate-2" aria-label="Noter 2 sur 10">2</label>
+
+              <input type="radio" id="rate-3" name="rating" value="3" disabled>
+              <label for="rate-3" aria-label="Noter 3 sur 10">3</label>
+
+              <input type="radio" id="rate-4" name="rating" value="4" disabled>
+              <label for="rate-4" aria-label="Noter 4 sur 10">4</label>
+
+              <input type="radio" id="rate-5" name="rating" value="5" disabled>
+              <label for="rate-5" aria-label="Noter 5 sur 10">5</label>
+
+              <input type="radio" id="rate-6" name="rating" value="6" disabled>
+              <label for="rate-6" aria-label="Noter 6 sur 10">6</label>
+
+              <input type="radio" id="rate-7" name="rating" value="7" disabled>
+              <label for="rate-7" aria-label="Noter 7 sur 10">7</label>
+
+              <input type="radio" id="rate-8" name="rating" value="8" disabled>
+              <label for="rate-8" aria-label="Noter 8 sur 10">8</label>
+
+              <input type="radio" id="rate-9" name="rating" value="9" disabled>
+              <label for="rate-9" aria-label="Noter 9 sur 10">9</label>
+
+              <input type="radio" id="rate-10" name="rating" value="10" disabled>
+              <label for="rate-10" aria-label="Noter 10 sur 10">10</label>
+            </div>
+
+            <div id="rating-help" class="sr-only">
+              Sélectionnez une note de 1 à 10 pour évaluer la qualité de la combinaison générée
+            </div>
+          </fieldset>
+
+          <div id="feedback" aria-live="polite" class="rating-feedback"></div>
+
+          <div class="submit-container">
+            <button id="submitRating" type="button" disabled aria-label="Envoyer votre évaluation">
+              <span aria-hidden="true">✅</span> Envoyer la note
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Partage -->
+      <section class="share-section" aria-labelledby="share-title">
+        <h2 id="share-title">
+          <span aria-hidden="true">📢</span> Partager la combinaison
+        </h2>
+
+        <div class="button-group" role="group" aria-labelledby="share-title">
+          <button id="shareTwitter" type="button" aria-label="Partager sur Twitter">
+            <span aria-hidden="true">🐦</span> Twitter
+          </button>
+          <button id="shareWhatsApp" type="button" aria-label="Partager sur WhatsApp">
+            <span aria-hidden="true">📲</span> WhatsApp
+          </button>
+          <button id="shareFacebook" type="button" aria-label="Partager sur Facebook">
+            <span aria-hidden="true">📘</span> Facebook
+          </button>
+          <button id="shareEmail" type="button" aria-label="Partager par email">
+            <span aria-hidden="true">✉️</span> Email
+          </button>
+          <button id="generateImage" type="button" aria-label="Télécharger une image de la combinaison">
+            <span aria-hidden="true">📸</span> Image Instagram
+          </button>
+        </div>
+      </section>
+
+      <!-- Statistiques -->
+      <section class="statistics-section" aria-labelledby="stats-title">
+        <div id="statistics">
+          <h2 id="stats-title">
+            <span aria-hidden="true">📊</span> Statistiques
+          </h2>
+
+          <div class="stats-grid" role="region" aria-labelledby="stats-title">
+            <div class="stat-item">
+              <span id="totalCombinations" aria-label="Nombre total de combinaisons notées">
+                Total des combinaisons notées : 0
+              </span>
+            </div>
+            <div class="stat-item">
+              <span id="averageNote" aria-label="Note moyenne des combinaisons">
+                Note moyenne : -
+              </span>
+            </div>
+            <div class="stat-item">
+              <span id="bestNote" aria-label="Meilleure note attribuée">
+                Meilleure note : -
+              </span>
+            </div>
+            <div class="stat-item">
+              <span id="worstNote" aria-label="Note la plus basse attribuée">
+                Pire note : -
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historique -->
+      <section class="history-section" aria-labelledby="history-title">
+        <div id="history">
+          <h2 id="history-title">
+            <span aria-hidden="true">📚</span> Historique des combinaisons
+          </h2>
+
+          <div class="history-controls" role="toolbar" aria-label="Contrôles de l'historique">
+            <button id="sortUp" type="button" aria-label="Trier par note croissante">
+              <span aria-hidden="true">⬆️</span> Croissant
+            </button>
+            <button id="sortDown" type="button" aria-label="Trier par note décroissante">
+              <span aria-hidden="true">⬇️</span> Décroissant
+            </button>
+            <button id="randomSort" type="button" aria-label="Mélanger l'ordre aléatoirement">
+              <span aria-hidden="true">🎲</span> Aléatoire
+            </button>
+            <button id="exportTXT" type="button" aria-label="Exporter l'historique au format texte">
+              <span aria-hidden="true">📄</span> Export TXT
+            </button>
+            <button id="exportPDF" type="button" aria-label="Exporter l'historique au format PDF">
+              <span aria-hidden="true">🖨️</span> Export PDF
+            </button>
+            <button id="resetCache" type="button" aria-label="Réinitialiser complètement l'historique"
+              class="danger-btn">
+              <span aria-hidden="true">♻️</span> Reset cache
+            </button>
+          </div>
+
+          <div id="history-list" role="list" aria-label="Liste des combinaisons précédentes">
+            <!-- Les entrées d'historique seront ajoutées ici dynamiquement -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer role="contentinfo">
+      <p>© Tous droits réservés — Les éditions augmentées Provoq'émois</p>
+      <p class="footer-subtitle">
+        Générateur de poésie quantique - Version 2.1
+      </p>
+
+      <!-- Informations d'accessibilité -->
+      <div class="accessibility-info">
+        <h3 class="sr-only">Informations d'accessibilité</h3>
+        <p class="sr-only">
+          Cette application est conçue pour être accessible à tous.
+          Utilisez les touches fléchées pour naviguer dans les options de notation,
+          la touche Entrée ou Espace pour sélectionner des éléments.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Messages d'aide cachés pour les lecteurs d'écran -->
+    <div id="screen-reader-messages" class="sr-only" aria-live="polite" aria-atomic="true">
+      <!-- Les messages dynamiques pour les lecteurs d'écran apparaîtront ici -->
+    </div>
+
+    <!-- Audio intégré pour les effets sonores -->
+    <audio id="typewriterSound" preload="auto" aria-hidden="true">
+      <source
+        src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1O2+dSEELYXR8d2CNwYYZrHl2J1VEAFP"
+        type="audio/wav">
+      <!-- Fallback pour navigateurs sans support audio -->
+      Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+  </div>
+
+  <!-- Chargement du script principal -->
+  <!-- Pour l'architecture modulaire, utilisez : -->
+  <!-- <script type="module" src="js/main.js"></script> -->
+
+  <!-- Pour l'architecture simple, utilisez : -->
+  <script type="module" src="js/main.js"></script>
+
+  <!-- Script d'initialisation pour l'accessibilité -->
+  <script>
+    // Amélioration progressive pour l'accessibilité
+    document.addEventListener('DOMContentLoaded', function () {
+      // Annoncer le chargement complet aux lecteurs d'écran
+      const srMessages = document.getElementById('screen-reader-messages');
+      if (srMessages) {
+        srMessages.textContent = 'Application chargée. Générateur de combinaisons poétiques prêt à utiliser.';
+      }
+
+      // Gérer l'état de focus visible
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab') {
+          document.body.classList.add('user-is-tabbing');
+        }
+      });
+
+      document.addEventListener('mousedown', function () {
+        document.body.classList.remove('user-is-tabbing');
+      });
+
+      // Améliorer la navigation clavier dans les mots
+      const words = document.querySelectorAll('[data-word]');
+      words.forEach((word, index) => {
+        word.addEventListener('keydown', function (e) {
+          let nextIndex;
+          switch (e.key) {
+            case 'ArrowRight':
+              nextIndex = (index + 1) % words.length;
+              words[nextIndex].focus();
+              e.preventDefault();
+              break;
+            case 'ArrowLeft':
+              nextIndex = (index - 1 + words.length) % words.length;
+              words[nextIndex].focus();
+              e.preventDefault();
+              break;
+            case 'Home':
+              words[0].focus();
+              e.preventDefault();
+              break;
+            case 'End':
+              words[words.length - 1].focus();
+              e.preventDefault();
+              break;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
