@@ -5,19 +5,33 @@ Version 2.1 - Architecture ES6 robuste avec communication inter-modules optimis�
 Un générateur de poésie interactive avancé développé avec JavaScript ES6 moderne, utilisant une architecture modulaire ultra-robuste et des pratiques de développement de niveau production.
 📁 Architecture du Projet
 generateur-poetique/
+
 ├── index.html # 🏠 Page principale HTML5 sémantique
+
 ├── styles.css # 🎨 Styles CSS avec variables et responsive
+
 ├── js/ # 📦 Modules JavaScript ES6
+
 │ ├── config.js # ⚙️ Configuration centralisée avec validation
+
 │ ├── main.js # 🚀 Point d'entrée avec gestion d'erreurs
+
 │ ├── PoeticGenerator.js # 🎭 Orchestrateur principal (NOUVEAU)
+
 │ ├── NotificationManager.js # 📢 Gestion des notifications (CORRIGÉ)
+
 │ ├── AudioManager.js # 🔊 Contrôle audio et préférences
+
 │ ├── WordManager.js # 🏷️ Sélection et gestion des mots
+
 │ ├── CombinationGenerator.js # 🎯 Génération et animation des combinaisons
+
 │ ├── HistoryManager.js # 📊 Historique et statistiques (COMPLÉTÉ)
+
 │ ├── RatingManager.js # ⭐ Système de notation
+
 │ └── ShareManager.js # 📱 Fonctionnalités de partage
+
 └── README.md # 📖 Cette documentation
 
 🚀 Installation & Démarrage
@@ -126,17 +140,29 @@ Le PoeticGenerator principal orchestre l'initialisation et la communication entr
 🔗 Communication Inter-Modules Optimisée
 javascript// Architecture des dépendances (ordre d'initialisation)
 PoeticGenerator (main orchestrator)
+
 ├── Phase 1: Modules Indépendants
+
 │ ├── HistoryManager (stockage et statistiques)
+
 │ └── AudioManager (gestion du son)
+
 ├── Phase 2: Dépendances Simples
+
 │ ├── WordManager (dépend de AudioManager)
+
 │ ├── CombinationGenerator (dépend de WordManager, AudioManager)
+
 │ └── ShareManager (dépend de CombinationGenerator)
+
 ├── Phase 3: Dépendances Complexes
+
 │ └── RatingManager (dépend de HistoryManager)
+
 └── Phase 4: Finalisation
+
 └── Connexions circulaires résolues (CombinationGenerator ↔ RatingManager)
+
 📋 Modules Détaillés
 PoeticGenerator.js - Orchestrateur Principal 🆕
 
