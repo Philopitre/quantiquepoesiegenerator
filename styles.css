@@ -36,6 +36,73 @@ body {
   font-size: 16px;
 }
 
+/* Navigation globale */
+.main-nav {
+  background: linear-gradient(135deg, var(--forest) 0%, var(--primary-color) 100%);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nav-logo h1 {
+  color: var(--white);
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Classes utilitaires */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .container {
   max-width: 800px;
   margin: 0 auto;
@@ -61,6 +128,138 @@ h2 {
 h3 {
   color: var(--primary-color);
   font-size: 1.2rem;
+}
+
+/* ===================================
+   CLASSES UTILITAIRES ET ACCESSIBILITÉ
+   =================================== */
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-top: -10px;
+  font-style: italic;
+}
+
+.footer-subtitle {
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+.control-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.controls-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.generation-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.rating-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rating-feedback {
+  min-height: 40px;
+}
+
+.submit-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.history-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+}
+
+.danger-btn {
+  background: linear-gradient(135deg, #E76F51 0%, #C44536 100%) !important;
+}
+
+.danger-btn:hover {
+  background: linear-gradient(135deg, #C44536 0%, #A63828 100%) !important;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+.word-list-label {
+  display: block;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.accessibility-info {
+  margin-top: 20px;
+}
+
+/* Focus visible pour l'accessibilité */
+body.user-is-tabbing *:focus {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Animation de chargement */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Sections principales */
+.word-selection,
+.main-controls,
+.result-section,
+.rating-section,
+.share-section,
+.statistics-section,
+.history-section {
+  margin-bottom: 30px;
 }
 
 /* Styles pour les mots - Version Nature */
@@ -517,6 +716,22 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .nav-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .nav-menu {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    text-align: center;
+  }
+
   .container {
     padding: 15px;
   }
@@ -545,6 +760,19 @@ footer {
   .full-word-list {
     font-size: 0.9rem;
     padding: 15px;
+  }
+
+  /* Page d'accueil responsive */
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
   }
 }
 
