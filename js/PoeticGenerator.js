@@ -12,6 +12,7 @@ import { CombinationGenerator } from './CombinationGenerator.js';
 import { HistoryManager } from './HistoryManager.js';
 import { RatingManager } from './RatingManager.js';
 import { ShareManager } from './ShareManager.js';
+import { OrdinationManager } from './OrdinationManager.js';
 
 /**
  * Classe principale qui orchestre toute l'application
@@ -95,6 +96,9 @@ export class PoeticGenerator {
    * @private
    */
   async initializeDependentModules() {
+    // OrdinationManager dépend d'AudioManager - DOIT ÊTRE INITIALISÉ EN PREMIER
+    this.managers.ordination = new OrdinationManager(this.managers.audio);
+    
     // WordManager dépend d'AudioManager
     this.managers.word = new WordManager(this.managers.audio);
     
@@ -275,7 +279,7 @@ export class PoeticGenerator {
    * @returns {Object} Résultat de la validation
    */
   validateInitialization() {
-    const expectedManagers = ['audio', 'word', 'combination', 'history', 'rating', 'share'];
+    const expectedManagers = ['audio', 'word', 'combination', 'history', 'rating', 'share', 'ordination'];
     const actualManagers = Object.keys(this.managers);
     
     const missing = expectedManagers.filter(name => !this.managers[name]);

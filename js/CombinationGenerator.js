@@ -308,61 +308,61 @@ export class CombinationGenerator {
     }
   }
   
-  /**
-   * Anime l'affichage du résultat avec l'effet machine à écrire
-   * @private
-   * @param {string} text - Texte à animer
-   */
-  animateResult(text) {
-    const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
-    
-    if (!resultElement) {
-      console.error('CombinationGenerator: Élément de résultat non trouvé');
-      this.isGenerating = false;
-      return;
-    }
-    
-    // Nettoyer l'animation précédente
-    this.stopCurrentAnimation();
-    
-    // Initialiser l'affichage
-    resultElement.innerHTML = '';
-    resultElement.setAttribute('aria-busy', 'true');
-    
-    let characterIndex = 0;
-    
-    // Créer et ajouter le curseur
-    const cursor = this.createCursor();
-    resultElement.appendChild(cursor);
-    
-    // Fonction d'animation récursive
-    const animateNextCharacter = () => {
-      if (characterIndex < text.length) {
-        // Ajouter le caractère avant le curseur
-        const character = text[characterIndex];
-        cursor.insertAdjacentText('beforebegin', character);
-        
-        // Jouer le son pour les lettres (pas pour les espaces)
-        if (character !== ' ') {
-          this.audioManager.playSound({
-            volume: 0.5,
-            playbackRate: 1 + (Math.random() * 0.2 - 0.1) // Légère variation
-          });
-        }
-        
-        characterIndex++;
-        
-        // Programmer la prochaine lettre
-        this.animationTimeout = setTimeout(animateNextCharacter, CONFIG.ANIMATION_DELAY);
-      } else {
-        // Animation terminée
-        this.onAnimationComplete(resultElement, cursor);
-      }
-    };
-    
-    // Démarrer l'animation
-    animateNextCharacter();
+ /**
+ * Anime l'affichage du résultat avec l'effet machine à écrire
+ * @private
+ * @param {string} text - Texte à animer
+ */
+animateResult(text) {
+  const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
+  
+  if (!resultElement) {
+    console.error('CombinationGenerator: Élément de résultat non trouvé');
+    this.isGenerating = false;
+    return;
   }
+  
+  // Nettoyer l'animation précédente
+  this.stopCurrentAnimation();
+  
+  // Initialiser l'affichage - VIDER COMPLÈTEMENT LE CONTENU
+  resultElement.innerHTML = '';
+  resultElement.setAttribute('aria-busy', 'true');
+  
+  let characterIndex = 0;
+  
+  // Créer et ajouter le curseur
+  const cursor = this.createCursor();
+  resultElement.appendChild(cursor);
+  
+  // Fonction d'animation récursive
+  const animateNextCharacter = () => {
+    if (characterIndex < text.length) {
+      // Ajouter le caractère avant le curseur
+      const character = text[characterIndex];
+      cursor.insertAdjacentText('beforebegin', character);
+      
+      // Jouer le son pour les lettres (pas pour les espaces)
+      if (character !== ' ') {
+        this.audioManager.playSound({
+          volume: 0.5,
+          playbackRate: 1 + (Math.random() * 0.2 - 0.1) // Légère variation
+        });
+      }
+      
+      characterIndex++;
+      
+      // Programmer la prochaine lettre
+      this.animationTimeout = setTimeout(animateNextCharacter, CONFIG.ANIMATION_DELAY);
+    } else {
+      // Animation terminée
+      this.onAnimationComplete(resultElement, cursor);
+    }
+  };
+  
+  // Démarrer l'animation
+  animateNextCharacter();
+}
   
   /**
    * Crée l'élément curseur pour l'animation

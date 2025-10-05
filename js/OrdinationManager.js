@@ -22,7 +22,7 @@ export class OrdinationManager {
     }
     
     this.audioManager = audioManager;
-    this.currentOrdination = 'original'; // 'original' ou 'alternative'
+    this.currentOrdination = 'original';
     this.wordListElement = null;
     this.toggleButton = null;
     
@@ -58,21 +58,21 @@ export class OrdinationManager {
         words: [
           { text: "Je", group: 1 },
           { text: "suis", group: 1 },
-          { text: "rêveur", group: 2 },
           { text: "professionnel", group: 1 },
           { text: "dans", group: 1 },
-          { text: "mon", group: 2 },
-          { text: "métier", group: 2 },
-          { text: "exceptionnel", group: 2 },
           { text: "l'erreur", group: 1 },
           { text: "en", group: 1 },
           { text: "tout", group: 1 },
           { text: "genre", group: 1 },
-          { text: "est", group: 2 },
           { text: "proscrite", group: 1 },
           { text: "la", group: 1 },
           { text: "souveraine", group: 1 },
           { text: "intelligence", group: 1 },
+          { text: "Rêveur", group: 2, dataWord: "rêveur" },
+          { text: "mon", group: 2 },
+          { text: "métier", group: 2 },
+          { text: "exceptionnel", group: 2 },
+          { text: "est", group: 2 },
           { text: "pour", group: 2 },
           { text: "moi-même", group: 2 },
           { text: "grandissant", group: 2 }
@@ -120,14 +120,12 @@ export class OrdinationManager {
    * @private
    */
   createToggleButton() {
-    // Trouver le conteneur des contrôles
     const controlsTop = document.querySelector('.controls-top');
     if (!controlsTop) {
       console.error('OrdinationManager: Conteneur de contrôles non trouvé');
       return;
     }
     
-    // Créer le bouton
     this.toggleButton = document.createElement('button');
     this.toggleButton.id = 'toggleOrdination';
     this.toggleButton.className = 'secondary';
@@ -135,7 +133,6 @@ export class OrdinationManager {
     this.toggleButton.setAttribute('aria-label', 'Permuter entre les deux ordinations des mots');
     this.toggleButton.setAttribute('title', 'Changer l\'arrangement des mots');
     
-    // Ajouter au conteneur
     controlsTop.appendChild(this.toggleButton);
     
     if (CONFIG.DEBUG.ENABLED) {
@@ -149,7 +146,10 @@ export class OrdinationManager {
    */
   setupEventListeners() {
     if (this.toggleButton) {
-      this.toggleButton.addEventListener('click', () => this.toggleOrdination());
+      this.toggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleOrdination();
+      });
     }
   }
   
@@ -164,7 +164,6 @@ export class OrdinationManager {
         this.currentOrdination = saved;
       }
       
-      // Appliquer l'ordination courante
       this.applyOrdination(this.currentOrdination, false);
       
       if (CONFIG.DEBUG.ENABLED) {
@@ -197,32 +196,31 @@ export class OrdinationManager {
   toggleOrdination() {
     const newOrdination = this.currentOrdination === 'original' ? 'alternative' : 'original';
     
-    // Effet visuel de transition
+    if (CONFIG.DEBUG.ENABLED) {
+      console.log('OrdinationManager: Basculement demandé vers:', newOrdination);
+    }
+    
     this.addTransitionEffect();
     
-    // Changer l'ordination après un court délai pour l'effet visuel
     setTimeout(() => {
       this.applyOrdination(newOrdination, true);
       this.currentOrdination = newOrdination;
       this.saveOrdination();
       this.updateButtonDisplay();
-      
-      // Son de confirmation
       this.playToggleSound();
       
-      // Notification
       const ordinationName = this.ordinations[newOrdination].name;
-      NotificationManager.show(`Basculé vers : ${ordinationName} ✨`);
+      NotificationManager.show(`Basculé vers : ${ordinationName}`);
       
       if (CONFIG.DEBUG.ENABLED) {
-        console.log('OrdinationManager: Basculement vers:', newOrdination);
+        console.log('OrdinationManager: Basculement effectué vers:', newOrdination);
       }
     }, 150);
   }
   
   /**
    * Applique une ordination spécifique
-   * @param {string} ordinationType - Type d'ordination ('original' ou 'alternative')
+   * @param {string} ordinationType - Type d'ordination
    * @param {boolean} animate - Activer l'animation
    * @private
    */
@@ -236,14 +234,12 @@ export class OrdinationManager {
     const wordsHTML = this.generateWordsHTML(ordination.words);
     
     if (animate) {
-      // Animation de transition
       this.wordListElement.style.opacity = '0';
       setTimeout(() => {
         this.updateWordListContent(wordsHTML);
         this.wordListElement.style.opacity = '1';
       }, 150);
     } else {
-      // Mise à jour directe
       this.updateWordListContent(wordsHTML);
     }
   }
@@ -257,10 +253,13 @@ export class OrdinationManager {
   generateWordsHTML(words) {
     const wordsSpans = words.map(word => {
       const groupClass = `word-group-${word.group}`;
-      return `<span class="${groupClass}" data-word="${word.text}">${word.text}</span>`;
-    }).join('\n      ');
+      // Utiliser dataWord s'il existe, sinon utiliser text
+      const dataWordValue = word.dataWord || word.text;
+      return `<span class="${groupClass}" data-word="${dataWordValue}" role="checkbox" aria-checked="true" tabindex="0" aria-label="Mot : ${word.text}">${word.text}</span>`;
+    }).join('\n          ');
     
-    return `Mots disponibles:\n      ${wordsSpans}`;
+    return `<span class="word-list-label">Mots disponibles :</span>
+          ${wordsSpans}`;
   }
   
   /**
@@ -270,8 +269,6 @@ export class OrdinationManager {
    */
   updateWordListContent(htmlContent) {
     this.wordListElement.innerHTML = htmlContent;
-    
-    // Émettre un événement pour notifier les autres modules
     this.dispatchOrdinationChangeEvent();
   }
   
@@ -302,9 +299,8 @@ export class OrdinationManager {
     const nextName = this.ordinations[nextOrdination].name;
     
     this.toggleButton.innerHTML = `🔄 Vers ${nextName.replace('Ordination ', '')}`;
-    this.toggleButton.setAttribute('title', `Actuellement: ${ordinationName}. Cliquer pour passer à: ${nextName}`);
+    this.toggleButton.setAttribute('title', `Actuellement: ${ordinationName}. Cliquer pour passer à : ${nextName}`);
     
-    // Effet visuel temporaire
     this.toggleButton.classList.add('ordination-changed');
     setTimeout(() => {
       this.toggleButton.classList.remove('ordination-changed');
@@ -318,7 +314,6 @@ export class OrdinationManager {
   playToggleSound() {
     if (this.audioManager && this.audioManager.isSoundEnabled()) {
       try {
-        // Son spécial pour le basculement (fréquence plus haute)
         this.audioManager.playSound({
           volume: 0.2,
           playbackRate: 1.5
@@ -401,7 +396,6 @@ export class OrdinationManager {
     const issues = [];
     const warnings = [];
     
-    // Vérifier les éléments DOM
     if (!this.wordListElement) {
       issues.push('Liste de mots manquante');
     }
@@ -410,7 +404,6 @@ export class OrdinationManager {
       issues.push('Bouton de basculement manquant');
     }
     
-    // Vérifier les ordinations
     Object.entries(this.ordinations).forEach(([key, ordination]) => {
       if (!ordination.words || !Array.isArray(ordination.words)) {
         issues.push(`Ordination ${key} invalide`);
@@ -452,17 +445,14 @@ export class OrdinationManager {
    * Nettoie les ressources
    */
   cleanup() {
-    // Supprimer les event listeners
     if (this.toggleButton) {
       this.toggleButton.removeEventListener('click', () => {});
     }
     
-    // Supprimer le bouton du DOM
     if (this.toggleButton && this.toggleButton.parentNode) {
       this.toggleButton.parentNode.removeChild(this.toggleButton);
     }
     
-    // Réinitialiser les références
     this.wordListElement = null;
     this.toggleButton = null;
     

@@ -45,6 +45,30 @@ export class WordManager {
     this.selectAllWords();
     this.updateCounter();
     this.validateWords();
+    
+    // Écouter les changements d'ordination pour réinitialiser les listeners
+    document.addEventListener('ordinationChanged', () => {
+      this.onOrdinationChanged();
+    });
+  }
+  
+  /**
+   * Appelée quand l'ordination change
+   * @private
+   */
+  onOrdinationChanged() {
+    // Rafraîchir les références DOM
+    this.wordElements = this.wordListElement.querySelectorAll(CONFIG.SELECTORS.WORD_ELEMENTS);
+    
+    // Réappliquer les event listeners
+    this.attachWordEventListeners();
+    
+    // Réappliquer l'état de sélection
+    this.reapplySelectionState();
+    
+    if (CONFIG.DEBUG.ENABLED) {
+      console.log('WordManager: Event listeners réinitialisés après changement d\'ordination');
+    }
   }
   
   /**
@@ -78,18 +102,62 @@ export class WordManager {
    */
   setupEventListeners() {
     // Event listeners pour chaque mot
-    this.wordElements.forEach(element => {
-      element.addEventListener('click', (e) => this.handleWordClick(e));
-      element.addEventListener('keydown', (e) => this.handleWordKeydown(e));
-      
-      // Rendre focusable pour l'accessibilité
-      element.setAttribute('tabindex', '0');
-      element.setAttribute('role', 'checkbox');
-      element.setAttribute('aria-checked', 'true');
-    });
+    this.attachWordEventListeners();
     
     // Event listeners pour les raccourcis clavier globaux
     document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
+  }
+  
+  /**
+   * Attache les event listeners aux éléments de mots
+   * @private
+   */
+  attachWordEventListeners() {
+    this.wordElements.forEach(element => {
+      // Cloner l'élément pour supprimer les anciens listeners
+      const newElement = element.cloneNode(true);
+      element.parentNode.replaceChild(newElement, element);
+      
+      // Ajouter les nouveaux listeners
+      newElement.addEventListener('click', (e) => this.handleWordClick(e));
+      newElement.addEventListener('keydown', (e) => this.handleWordKeydown(e));
+      
+      // Rendre focusable pour l'accessibilité
+      newElement.setAttribute('tabindex', '0');
+      newElement.setAttribute('role', 'checkbox');
+      
+      // Appliquer l'état de sélection actuel
+      const word = newElement.getAttribute('data-word');
+      if (this.selectedWords.has(word)) {
+        newElement.setAttribute('aria-checked', 'true');
+        newElement.classList.remove(CONFIG.CSS_CLASSES.WORD_HIDDEN);
+      } else {
+        newElement.setAttribute('aria-checked', 'false');
+        newElement.classList.add(CONFIG.CSS_CLASSES.WORD_HIDDEN);
+      }
+    });
+    
+    // Mettre à jour la référence wordElements
+    this.wordElements = this.wordListElement.querySelectorAll(CONFIG.SELECTORS.WORD_ELEMENTS);
+  }
+  
+  /**
+   * Réapplique l'état de sélection après un changement d'ordination
+   * @private
+   */
+  reapplySelectionState() {
+    this.wordElements.forEach(element => {
+      const word = element.getAttribute('data-word');
+      if (this.selectedWords.has(word)) {
+        element.classList.remove(CONFIG.CSS_CLASSES.WORD_HIDDEN);
+        element.setAttribute('aria-checked', 'true');
+      } else {
+        element.classList.add(CONFIG.CSS_CLASSES.WORD_HIDDEN);
+        element.setAttribute('aria-checked', 'false');
+      }
+    });
+    
+    this.updateCounter();
   }
   
   /**
@@ -139,7 +207,7 @@ export class WordManager {
     }
     
     this.toggleWord(word);
-    this.playWordSound(); // CORRIGÉ: Utilise la nouvelle méthode
+    this.playWordSound();
     
     if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_EVENTS) {
       console.log('WordManager: Clic sur mot:', word);
@@ -257,7 +325,7 @@ export class WordManager {
     });
     
     this.updateCounter();
-    this.playWordSound(); // CORRIGÉ: Utilise la nouvelle méthode
+    this.playWordSound();
     
     if (CONFIG.DEBUG.ENABLED) {
       console.log('WordManager: Tous les mots sélectionnés');
@@ -295,7 +363,7 @@ export class WordManager {
       this.updateCounter();
     }, delay);
     
-    this.playWordSound(); // CORRIGÉ: Utilise la nouvelle méthode
+    this.playWordSound();
     NotificationManager.success(CONFIG.MESSAGES.ALL_WORDS_RESET);
     
     if (CONFIG.DEBUG.ENABLED) {
@@ -539,6 +607,7 @@ export class WordManager {
     });
     
     document.removeEventListener('keydown', () => {});
+    document.removeEventListener('ordinationChanged', () => {});
     
     // Réinitialiser les références
     this.selectedWords.clear();
