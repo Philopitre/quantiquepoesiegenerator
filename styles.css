@@ -866,7 +866,7 @@ button.secondary:hover {
 
 /* ===================================
    NOTIFICATIONS
-   =================================== */
+   ===================================== */
 .notification {
   position: fixed;
   bottom: 20px;
@@ -981,17 +981,17 @@ footer {
     padding: 15px;
   }
 
-  /* Page d'accueil - mobile */
+  /* Page d'accueil - mobile - TAILLES AUGMENTÉES */
   .hero-section .hero-title {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     min-height: 260px;
     padding: 0 10px;
     line-height: 1.6;
   }
 
   .hero-section .hero-word {
-    margin: 0 2px;
-    font-size: 0.85em;
+    margin: 0 3px;
+    font-size: 1em;
   }
 
   .hero-subtitle {
@@ -1004,390 +1004,393 @@ footer {
 
   .intro-section {
     padding: 20px;
-    }
-    }
-    
-    /* Petits mobiles */
-    @media (max-width: 480px) {
-      .rating label {
-        width: 38px;
-        height: 38px;
-        line-height: 38px;
-      }
-    
-      .result {
-        font-size: 1rem;
-        padding: 20px;
-      }
-    
-      /* Page d'accueil - petits mobiles */
-      .hero-section .hero-title {
-        font-size: 1.1rem;
-        min-height: 300px;
-        padding: 0 5px;
-        line-height: 1.5;
-      }
-    
-      .hero-section .hero-word {
-        margin: 0 2px;
-        font-size: 0.8em;
-      }
-    
-      .hero-section .hero-cursor {
-        width: 2px;
-        height: 1em;
-      }
-    
-      .nav-logo h1 {
-        font-size: 1rem;
-      }
-    
-      .hero-subtitle {
-        font-size: 1rem;
-      }
-    
-      .intro-section {
-        padding: 15px;
-        margin: 30px 0;
-      }
-    
-      .intro-content h3 {
-        font-size: 1.1rem;
-      }
-    
-      .intro-content p {
-        font-size: 0.95rem;
-      }
-    
-      .tool-card {
-        padding: 20px;
-      }
-    
-      .tool-icon {
-        font-size: 2.5rem;
-      }
-    
-      .tool-card h4 {
-        font-size: 1.1rem;
-      }
-    
-      .tool-card p {
-        font-size: 0.9rem;
-      }
-    
-      .tools-section h3 {
-        font-size: 1.3rem;
-      }
-    
-      footer {
-        padding: 20px 15px;
-        font-size: 0.85rem;
-      }
-    }
-    
-    /* Très petits mobiles */
-    @media (max-width: 380px) {
-      .hero-section .hero-title {
-        font-size: 0.95rem;
-        min-height: 340px;
-        line-height: 1.4;
-      }
-    
-      .hero-section .hero-word {
-        margin: 0 1px;
-        font-size: 0.75em;
-      }
-    
-      .hero-subtitle {
-        font-size: 0.9rem;
-      }
-    
-      .intro-content p {
-        font-size: 0.9rem;
-      }
-    
-      .tool-card h4 {
-        font-size: 1rem;
-      }
-    
-      .tool-card p {
-        font-size: 0.85rem;
-      }
-    
-      .nav-logo h1 {
-        font-size: 0.9rem;
-      }
-    
-      button {
-        padding: 12px 20px;
-        font-size: 0.9rem;
-      }
-    
-      .hero-section .hero-cursor {
-        width: 2px;
-        height: 0.9em;
-      }
-    }
-    
-    /* Écrans larges */
-    @media (min-width: 1200px) {
-      .container {
-        max-width: 900px;
-      }
-    
-      .nav-container {
-        max-width: 1400px;
-      }
-    
-      .hero-section .hero-title {
-        font-size: 2.2rem;
-        min-height: 180px;
-      }
-    
-      .hero-section .hero-word {
-        margin: 0 5px;
-        font-size: 1em;
-      }
-    
-      .hero-subtitle {
-        font-size: 1.4rem;
-      }
-    
-      .intro-content p {
-        font-size: 1.15rem;
-      }
-    
-      .tools-grid {
-        gap: 40px;
-      }
-    
-      .tool-card {
-        padding: 35px;
-      }
-    }
-    
-    /* ===================================
-       ANIMATIONS SUPPLÉMENTAIRES
-       =================================== */
-    
-    /* Animation d'entrée pour les cartes d'outils */
-    @keyframes slideInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-    
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .tool-card {
-      animation: slideInUp 0.6s ease-out;
-    }
-    
-    .tool-card:nth-child(1) {
-      animation-delay: 0.1s;
-      opacity: 0;
-      animation-fill-mode: forwards;
-    }
-    
-    .tool-card:nth-child(2) {
-      animation-delay: 0.2s;
-      opacity: 0;
-      animation-fill-mode: forwards;
-    }
-    
-    /* Animation pour l'intro section */
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-    
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-    
-    .intro-section {
-      animation: fadeInScale 0.8s ease-out 0.3s both;
-    }
-    
-    /* Animation du hero subtitle */
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-    
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .hero-subtitle {
-      animation: fadeInDown 0.8s ease-out 6.5s both;
-    }
-    
-    /* ===================================
-       ACCESSIBILITÉ
-       =================================== */
-    
-    /* Mode contraste élevé */
-    @media (prefers-contrast: high) {
-      .hero-section .hero-word.group-1 {
-        color: #2d4a3e;
-      }
-    
-      .hero-section .hero-word.group-2 {
-        color: #d68438;
-      }
-    
-      .word-group-1 {
-        background: linear-gradient(135deg, #3d5a4d 0%, #5a7e6e 100%);
-      }
-    
-      .word-group-2 {
-        background: linear-gradient(135deg, #d68438 0%, #c5503a 100%);
-      }
-    }
-    
-    /* Réduction des animations */
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    
-      .hero-section .hero-word {
-        animation: none;
-        opacity: 1;
-        transform: none;
-      }
-    
-      .hero-section .hero-cursor {
-        animation: none;
-      }
-    
-      button::before {
-        transition: none;
-      }
-    
-      .word-group-1:hover,
-      .word-group-2:hover {
-        transform: none;
-      }
-    
-      .tool-card {
-        animation: none;
-        opacity: 1;
-      }
-    
-      .intro-section {
-        animation: none;
-      }
-    
-      .hero-subtitle {
-        animation: none;
-      }
-    }
-    
-    /* ===================================
-       IMPRESSION
-       =================================== */
-    @media print {
-    
-      .main-nav,
-      .controls-top,
-      .controls,
-      .button-group,
-      .share-section,
-      .history-controls,
-      .tool-link,
-      .hero-section .hero-cursor,
-      footer {
-        display: none;
-      }
-    
-      body {
-        background: white;
-        color: black;
-      }
-    
-      .hero-section .hero-title {
-        color: black;
-        font-size: 1.5rem;
-      }
-    
-      .hero-section .hero-word {
-        color: black !important;
-      }
-    
-      .container {
-        max-width: 100%;
-      }
-    
-      .intro-section,
-      .tool-card {
-        border: 1px solid #ccc;
-        box-shadow: none;
-        page-break-inside: avoid;
-      }
-    
-      a {
-        text-decoration: underline;
-      }
-    }
-    
-    /* ===================================
-       SCROLLBARS PERSONNALISÉES
-       =================================== */
-    
-    /* WebKit (Chrome, Safari, Edge) */
-    ::-webkit-scrollbar {
-      width: 12px;
-      height: 12px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: var(--sand);
-      border-radius: 10px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, var(--forest) 0%, var(--primary-color) 100%);
-      border-radius: 10px;
-      border: 2px solid var(--sand);
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--moss) 100%);
-    }
-    
-    /* Firefox */
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: var(--forest) var(--sand);
-    }
-    
-    /* ===================================
-       SÉLECTION DE TEXTE
-       =================================== */
-    ::selection {
-      background-color: var(--accent-color);
-      color: white;
-    }
-    
-    ::-moz-selection {
-      background-color: var(--accent-color);
-      color: white;
-    }
-    
-    /* ===================================
-       FIN DU FICHIER CSS
-       =================================== */
+  }
+}
+
+/* Petits mobiles */
+@media (max-width: 480px) {
+  .rating label {
+    width: 38px;
+    height: 38px;
+    line-height: 38px;
+  }
+
+  .result {
+    font-size: 1rem;
+    padding: 20px;
+  }
+
+  /* Page d'accueil - petits mobiles - TAILLES AUGMENTÉES */
+  .hero-section .hero-title {
+    font-size: 1.6rem;
+    min-height: 280px;
+    padding: 0 8px;
+    line-height: 1.5;
+  }
+
+  .hero-section .hero-word {
+    margin: 0 2px;
+    font-size: 1em;
+  }
+
+  .hero-section .hero-cursor {
+    width: 2px;
+    height: 1em;
+  }
+
+  .nav-logo h1 {
+    font-size: 1rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .intro-section {
+    padding: 15px;
+    margin: 30px 0;
+  }
+
+  .intro-content h3 {
+    font-size: 1.1rem;
+  }
+
+  .intro-content p {
+    font-size: 0.95rem;
+  }
+
+  .tool-card {
+    padding: 20px;
+  }
+
+  .tool-icon {
+    font-size: 2.5rem;
+  }
+
+  .tool-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .tool-card p {
+    font-size: 0.9rem;
+  }
+
+  .tools-section h3 {
+    font-size: 1.3rem;
+  }
+
+  footer {
+    padding: 20px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Très petits mobiles */
+@media (max-width: 380px) {
+
+  /* Page d'accueil - très petits mobiles - TAILLES AUGMENTÉES */
+  .hero-section .hero-title {
+    font-size: 1.4rem;
+    min-height: 300px;
+    line-height: 1.4;
+    padding: 0 5px;
+  }
+
+  .hero-section .hero-word {
+    margin: 0 2px;
+    font-size: 0.95em;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .intro-content p {
+    font-size: 0.9rem;
+  }
+
+  .tool-card h4 {
+    font-size: 1rem;
+  }
+
+  .tool-card p {
+    font-size: 0.85rem;
+  }
+
+  .nav-logo h1 {
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+
+  .hero-section .hero-cursor {
+    width: 2px;
+    height: 0.9em;
+  }
+}
+
+/* Écrans larges */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 900px;
+  }
+
+  .nav-container {
+    max-width: 1400px;
+  }
+
+  .hero-section .hero-title {
+    font-size: 2.2rem;
+    min-height: 180px;
+  }
+
+  .hero-section .hero-word {
+    margin: 0 5px;
+    font-size: 1em;
+  }
+
+  .hero-subtitle {
+    font-size: 1.4rem;
+  }
+
+  .intro-content p {
+    font-size: 1.15rem;
+  }
+
+  .tools-grid {
+    gap: 40px;
+  }
+
+  .tool-card {
+    padding: 35px;
+  }
+}
+
+/* ===================================
+   ANIMATIONS SUPPLÉMENTAIRES
+   =================================== */
+
+/* Animation d'entrée pour les cartes d'outils */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.tool-card:nth-child(1) {
+  animation-delay: 0.1s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.tool-card:nth-child(2) {
+  animation-delay: 0.2s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+/* Animation pour l'intro section */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.intro-section {
+  animation: fadeInScale 0.8s ease-out 0.3s both;
+}
+
+/* Animation du hero subtitle */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-subtitle {
+  animation: fadeInDown 0.8s ease-out 6.5s both;
+}
+
+/* ===================================
+   ACCESSIBILITÉ
+   =================================== */
+
+/* Mode contraste élevé */
+@media (prefers-contrast: high) {
+  .hero-section .hero-word.group-1 {
+    color: #2d4a3e;
+  }
+
+  .hero-section .hero-word.group-2 {
+    color: #d68438;
+  }
+
+  .word-group-1 {
+    background: linear-gradient(135deg, #3d5a4d 0%, #5a7e6e 100%);
+  }
+
+  .word-group-2 {
+    background: linear-gradient(135deg, #d68438 0%, #c5503a 100%);
+  }
+}
+
+/* Réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hero-section .hero-word {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-section .hero-cursor {
+    animation: none;
+  }
+
+  button::before {
+    transition: none;
+  }
+
+  .word-group-1:hover,
+  .word-group-2:hover {
+    transform: none;
+  }
+
+  .tool-card {
+    animation: none;
+    opacity: 1;
+  }
+
+  .intro-section {
+    animation: none;
+  }
+
+  .hero-subtitle {
+    animation: none;
+  }
+}
+
+/* ===================================
+   IMPRESSION
+   =================================== */
+@media print {
+
+  .main-nav,
+  .controls-top,
+  .controls,
+  .button-group,
+  .share-section,
+  .history-controls,
+  .tool-link,
+  .hero-section .hero-cursor,
+  footer {
+    display: none;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .hero-section .hero-title {
+    color: black;
+    font-size: 1.5rem;
+  }
+
+  .hero-section .hero-word {
+    color: black !important;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  .intro-section,
+  .tool-card {
+    border: 1px solid #ccc;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+/* ===================================
+   SCROLLBARS PERSONNALISÉES
+   =================================== */
+
+/* WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sand);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--forest) 0%, var(--primary-color) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--sand);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--moss) 100%);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--forest) var(--sand);
+}
+
+/* ===================================
+   SÉLECTION DE TEXTE
+   =================================== */
+::selection {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+::-moz-selection {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+/* ===================================
+   FIN DU FICHIER CSS
+   =================================== */
