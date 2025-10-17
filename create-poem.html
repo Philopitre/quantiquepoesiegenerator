@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Le Je quantique - Prochainement sur Les éditions Philopitre. Composez votre poème comme vous souhaitez le lire.">
+  <meta name="keywords" content="poésie quantique, création poétique, jeu littéraire, éditions Philopitre">
+  <meta name="author" content="Les éditions augmentées Provoq'émois">
+  <title>Le Je quantique - Prochainement | Les éditions Philopitre</title>
+
+  <!-- Liens vers les feuilles de style -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Préchargement de polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%2352796F' viewBox='0 0 16 16'%3e%3cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3e%3cpath d='M8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z'/%3e%3c/svg%3e">
+
+  <style>
+    /* Styles spécifiques pour la page "Prochainement" */
+    .coming-soon-container {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .coming-soon-icon {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    .coming-soon-title {
+      font-size: 2.5rem;
+      color: var(--forest);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .coming-soon-subtitle {
+      font-size: 1.3rem;
+      color: var(--accent-color);
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    .concept-box {
+      background: linear-gradient(135deg, var(--cream) 0%, var(--white) 100%);
+      border: 3px solid var(--sage);
+      border-radius: var(--border-radius-lg);
+      padding: 3rem;
+      max-width: 900px;
+      margin: 2rem auto;
+      box-shadow: 0 8px 24px var(--shadow-medium);
+    }
+
+    .concept-heading {
+      font-size: 1.8rem;
+      color: var(--forest);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .concept-text {
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: var(--text-color);
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .concept-text strong {
+      color: var(--accent-secondary);
+      font-weight: 600;
+    }
+
+    .quantum-name {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: var(--border-radius);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 2rem 0;
+      box-shadow: 0 4px 12px var(--shadow-medium);
+    }
+
+    .slogan-box {
+      background: linear-gradient(135deg, var(--forest), var(--moss));
+      color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      font-size: 1.5rem;
+      font-style: italic;
+      margin-top: 2rem;
+      box-shadow: 0 4px 16px var(--shadow-dark);
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+      text-align: left;
+    }
+
+    .features-list li {
+      padding: 1rem;
+      margin: 0.8rem 0;
+      background: var(--white);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 8px;
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .features-list li:hover {
+      transform: translateX(10px);
+      box-shadow: 0 4px 12px var(--shadow-light);
+    }
+
+    .features-list li::before {
+      content: "✨ ";
+      font-size: 1.3rem;
+      margin-right: 0.5rem;
+    }
+
+    .cta-section {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--sage) 0%, var(--moss) 100%);
+      border-radius: var(--border-radius);
+      color: white;
+    }
+
+    .cta-text {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: white;
+      color: var(--forest);
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      background: var(--cream);
+    }
+
+    @media (max-width: 768px) {
+      .coming-soon-title {
+        font-size: 2rem;
+      }
+
+      .coming-soon-subtitle {
+        font-size: 1.1rem;
+      }
+
+      .concept-box {
+        padding: 2rem 1.5rem;
+      }
+
+      .concept-heading {
+        font-size: 1.5rem;
+      }
+
+      .concept-text {
+        font-size: 1rem;
+      }
+
+      .quantum-name {
+        font-size: 1.2rem;
+        padding: 1rem 1.5rem;
+      }
+
+      .slogan-box {
+        font-size: 1.2rem;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="main-nav" role="navigation">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h1>Les éditions Philopitre</h1>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Accueil</a></li>
+        <li><a href="generator.html" class="nav-link">Générateur de Combinaisons Poétiques</a></li>
+        <li><a href="create-poem.html" class="nav-link active">Créez votre propre poème</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Contenu principal -->
+  <div class="container">
+    <main id="main-content" role="main">
+
+      <div class="coming-soon-container">
+        <div class="coming-soon-icon" aria-hidden="true">🔮</div>
+
+        <h1 class="coming-soon-title">Prochainement</h1>
+        <p class="coming-soon-subtitle">Une nouvelle expérience poétique arrive...</p>
+
+        <div class="concept-box">
+          <h2 class="concept-heading">
+            <span aria-hidden="true">✍️</span>
+            Le concept
+          </h2>
+
+          <p class="concept-text">
+            <strong>Prochainement</strong>, vous pourrez composer votre poème exactement comme vous souhaitez le lire.
+            Libre à vous d'utiliser <strong>autant de mots</strong> que vous le désirez et dans <strong>l'ordre
+              souhaité</strong>
+            à partir de la proposition d'origine.
+          </p>
+
+          <p class="concept-text">
+            C'est là <strong>l'aspect le plus important de la poésie quantique</strong> : le lecteur est invité à jouer,
+            à devenir auteur. Vous ne serez plus un simple spectateur, mais un <strong>créateur actif</strong>
+            de votre propre expérience poétique.
+          </p>
+
+          <div class="quantum-name">
+            🌟 Le "Je quantique" 🌟
+            <div style="font-size: 0.9rem; margin-top: 0.5rem; font-weight: 400; opacity: 0.95;">
+              (c'est son petit nom)
+            </div>
+          </div>
+
+          <ul class="features-list">
+            <li><strong>Déplacez les mots</strong> librement sur votre espace de création</li>
+            <li><strong>Choisissez l'ordre</strong> qui résonne avec votre sensibilité</li>
+            <li><strong>Ajoutez ou retirez</strong> des mots selon votre inspiration</li>
+            <li><strong>Créez votre propre sens</strong> à partir du matériau poétique proposé</li>
+            <li><strong>Partagez vos créations</strong> uniques avec la communauté</li>
+          </ul>
+
+          <div class="slogan-box">
+            <div style="font-size: 0.9rem; margin-bottom: 0.5rem; opacity: 0.9;">
+              Une création des éditions Philopitre
+            </div>
+            <strong>Pour y voir (tout) ce que vous voulez.</strong>
+            <div style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.9;">
+              — Notre slogan —
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-section">
+          <p class="cta-text">
+            <strong>En attendant</strong>, découvrez notre Générateur de Combinaisons Poétiques<br>
+            et explorez les possibilités infinies de la poésie quantique !
+          </p>
+          <a href="generator.html" class="back-button">
+            ✨ Découvrir le Générateur
+          </a>
+        </div>
+
+      </div>
+
+    </main>
+
+    <footer role="contentinfo">
+      <p>© Tous droits réservés — Les éditions augmentées Provoq'émois</p>
+      <p class="footer-subtitle">
+        Poésie quantique - Version 2.1
+      </p>
+    </footer>
+  </div>
+
+  <!-- Animation au scroll -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Animation d'apparition progressive
+      const conceptBox = document.querySelector('.concept-box');
+
+      // Observer pour animation au scroll
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '0';
+            entry.target.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+              entry.target.style.transition = 'all 0.8s ease';
+              entry.target.style.opacity = '1';
+              entry.target.style.transform = 'translateY(0)';
+            }, 100);
+          }
+        });
+      });
+
+      if (conceptBox) {
+        observer.observe(conceptBox);
+      }
+
+      // Animation des éléments de la liste
+      const listItems = document.querySelectorAll('.features-list li');
+      listItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-20px)';
+
+        setTimeout(() => {
+          item.style.transition = 'all 0.5s ease';
+          item.style.opacity = '1';
+          item.style.transform = 'translateX(0)';
+        }, 300 + (index * 100));
+      });
+    });
+  </script>
+</body>
+
+</html>

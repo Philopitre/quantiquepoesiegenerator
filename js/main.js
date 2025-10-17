@@ -186,9 +186,6 @@ function setupGlobalErrorHandlers(app) {
     if (event.reason && event.reason.name !== 'TypeError' && !event.reason.message?.includes('fetch')) {
       showErrorNotification('Une erreur asynchrone est survenue.');
     }
-    
-    // Empêcher l'affichage de l'erreur dans la console (optionnel)
-    // event.preventDefault();
   });
   
   // Erreurs de chargement de ressources
@@ -214,19 +211,23 @@ function setupGlobalErrorHandlers(app) {
     }
   });
   
-  // Gestion de la visibilité de la page
+  // Gestion de la visibilité de la page (CORRIGÉ)
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       // Page cachée - sauvegarder l'état si nécessaire
       try {
-        if (app && app.isReady()) {
+        // Vérifier que l'app existe et a les méthodes nécessaires
+        if (app && typeof app.isReady === 'function' && app.isReady()) {
           const historyManager = app.getManager('history');
           if (historyManager && typeof historyManager.saveHistory === 'function') {
             historyManager.saveHistory();
           }
         }
       } catch (error) {
-        console.error('Erreur lors de la sauvegarde sur masquage:', error);
+        // Ne pas afficher d'erreur pour les problèmes de sauvegarde automatique
+        if (CONFIG.DEBUG.ENABLED) {
+          console.warn('Avertissement lors de la sauvegarde automatique:', error);
+        }
       }
     }
   });

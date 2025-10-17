@@ -1,6 +1,6 @@
 # 🌿 Générateur de Combinaisons Poétiques
 
-### Les éditions augmentées Provoq'émois
+### Les éditions augmentées Philopitre
 
 Une application web interactive pour créer des combinaisons poétiques uniques avec une interface moderne inspirée de la nature.
 
@@ -326,7 +326,7 @@ Utiliser le système d'issues du repository avec :
 
 Les éditions Philopitre
 
-- Site web : [URL]
+- Site web : [[URL](https://philopitre.github.io/quantiquepoesiegenerator/)]
 - Email : [contact@provoqemois.fr]
 
 ---

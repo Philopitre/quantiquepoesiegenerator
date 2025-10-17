@@ -1202,6 +1202,12 @@ footer {
   animation-fill-mode: forwards;
 }
 
+.tool-card:nth-child(3) {
+  animation-delay: 0.3s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
 /* Animation pour l'intro section */
 @keyframes fadeInScale {
   from {

@@ -108,9 +108,6 @@ export class PoeticGenerator {
       this.managers.audio
     );
     
-    // ShareManager dépend de CombinationGenerator
-    this.managers.share = new ShareManager(this.managers.combination);
-    
     if (CONFIG.DEBUG.ENABLED) {
       console.log('PoeticGenerator: Modules avec dépendances simples initialisés');
     }
@@ -123,6 +120,13 @@ export class PoeticGenerator {
   async initializeCircularDependencies() {
     // RatingManager dépend d'HistoryManager
     this.managers.rating = new RatingManager(this.managers.history);
+    
+    // ShareManager dépend de CombinationGenerator ET RatingManager
+    // IMPORTANT: RatingManager doit être créé AVANT ShareManager
+    this.managers.share = new ShareManager(
+      this.managers.combination,
+      this.managers.rating
+    );
     
     if (CONFIG.DEBUG.ENABLED) {
       console.log('PoeticGenerator: Modules avec références circulaires initialisés');
@@ -166,7 +170,7 @@ export class PoeticGenerator {
       { id: CONFIG.DOM_ELEMENTS.RANDOM_SORT, handler: () => this.managers.history.randomSort() },
       { id: CONFIG.DOM_ELEMENTS.EXPORT_TXT, handler: () => this.managers.history.exportTXT() },
       { id: CONFIG.DOM_ELEMENTS.EXPORT_PDF, handler: () => this.managers.history.exportPDF() },
-      { id: CONFIG.DOM_ELEMENTS.RESET_CACHE, handler: () => this.managers.history.reset() }
+      { id: CONFIG.DOM_ELEMENTS.RESET_CACHE, handler: () => this.handleResetCache() }
     ];
     
     buttons.forEach(({ id, handler }) => {
@@ -175,8 +179,8 @@ export class PoeticGenerator {
         const wrappedHandler = this.createSafeEventHandler(handler, id);
         element.addEventListener('click', wrappedHandler);
         this.eventListeners.set(id, { element, handler: wrappedHandler });
-      } else {
-        console.warn(`PoeticGenerator: Élément ${id} non trouvé`);
+      } else if (CONFIG.DEBUG.ENABLED) {
+        console.warn(`PoeticGenerator: Élément non trouvé: ${id}`);
       }
     });
     
@@ -186,19 +190,39 @@ export class PoeticGenerator {
   }
   
   /**
-   * Crée un gestionnaire d'événement sécurisé avec gestion d'erreur
+   * Gère la réinitialisation du cache
+   * @private
+   */
+  handleResetCache() {
+    if (confirm('⚠️ Êtes-vous sûr de vouloir réinitialiser tout l\'historique ? Cette action est irréversible.')) {
+      try {
+        this.managers.history.clearHistory();
+        NotificationManager.success('Historique réinitialisé avec succès');
+      } catch (error) {
+        console.error('Erreur lors de la réinitialisation:', error);
+        NotificationManager.error('Erreur lors de la réinitialisation');
+      }
+    }
+  }
+  
+  /**
+   * Crée un gestionnaire d'événement sécurisé avec gestion d'erreurs
    * @private
    * @param {Function} handler - Gestionnaire original
-   * @param {string} elementId - ID de l'élément pour le debug
+   * @param {string} buttonId - ID du bouton pour le debug
    * @returns {Function} Gestionnaire sécurisé
    */
-  createSafeEventHandler(handler, elementId) {
+  createSafeEventHandler(handler, buttonId) {
     return async (event) => {
       try {
-        event.preventDefault();
+        if (CONFIG.DEBUG.ENABLED) {
+          console.log(`PoeticGenerator: Événement déclenché: ${buttonId}`);
+        }
+        
         await handler(event);
+        
       } catch (error) {
-        console.error(`PoeticGenerator: Erreur dans le gestionnaire ${elementId}:`, error);
+        console.error(`PoeticGenerator: Erreur dans le gestionnaire ${buttonId}:`, error);
         NotificationManager.error('Une erreur est survenue. Veuillez réessayer.');
         
         if (CONFIG.DEBUG.ENABLED) {
@@ -314,6 +338,23 @@ export class PoeticGenerator {
   }
   
   /**
+   * Vérifie si l'application est prête à être utilisée
+   * @returns {boolean} True si l'application est initialisée
+   */
+  isReady() {
+    return this.isInitialized && Object.keys(this.managers).length > 0;
+  }
+  
+  /**
+   * Récupère un manager spécifique par son nom
+   * @param {string} name - Nom du manager (audio, word, combination, history, rating, share, ordination)
+   * @returns {Object|null} Le manager demandé ou null si non trouvé
+   */
+  getManager(name) {
+    return this.managers[name] || null;
+  }
+  
+  /**
    * Retourne les informations de debug de l'application
    * @returns {Object} Informations de debug complètes
    */
@@ -337,8 +378,6 @@ export class PoeticGenerator {
         } catch (error) {
           debugInfo.managers[name] = { error: error.message };
         }
-      } else {
-        debugInfo.managers[name] = { status: 'No debug info available' };
       }
     });
     
@@ -346,84 +385,38 @@ export class PoeticGenerator {
   }
   
   /**
-   * Retourne un gestionnaire spécifique
-   * @param {string} name - Nom du gestionnaire
-   * @returns {Object|null} Instance du gestionnaire
-   */
-  getManager(name) {
-    return this.managers[name] || null;
-  }
-  
-  /**
-   * Vérifie si l'application est prête
-   * @returns {boolean} État de préparation
-   */
-  isReady() {
-    return this.isInitialized && this.validateInitialization().isValid;
-  }
-  
-  /**
-   * Redémarre l'application
-   */
-  async restart() {
-    if (CONFIG.DEBUG.ENABLED) {
-      console.log('PoeticGenerator: Redémarrage de l\'application...');
-    }
-    
-    // Nettoyer d'abord
-    this.cleanup();
-    
-    // Réinitialiser l'état
-    this.managers = {};
-    this.isInitialized = false;
-    this.eventListeners.clear();
-    
-    // Relancer l'initialisation
-    await this.init();
-    
-    NotificationManager.success('Application redémarrée avec succès !');
-  }
-  
-  /**
-   * Nettoie toutes les ressources
+   * Nettoie tous les event listeners et ressources
    */
   cleanup() {
-    // Nettoyer les event listeners
-    this.eventListeners.forEach(({ element, handler }, id) => {
-      if (element && handler) {
-        if (id === 'keyboard') {
-          element.removeEventListener('keydown', handler);
-        } else {
-          element.removeEventListener('click', handler);
-        }
+    // Supprimer tous les event listeners
+    this.eventListeners.forEach(({ element, handler }) => {
+      try {
+        element.removeEventListener('click', handler);
+        element.removeEventListener('keydown', handler);
+      } catch (error) {
+        console.warn('PoeticGenerator: Erreur lors du nettoyage d\'un listener:', error);
       }
     });
+    
     this.eventListeners.clear();
     
-    // Nettoyer les gestionnaires
+    // Nettoyer chaque module
     Object.values(this.managers).forEach(manager => {
       if (typeof manager.cleanup === 'function') {
         try {
           manager.cleanup();
         } catch (error) {
-          console.error('PoeticGenerator: Erreur lors du nettoyage d\'un gestionnaire:', error);
+          console.warn('PoeticGenerator: Erreur lors du nettoyage d\'un module:', error);
         }
       }
     });
     
-    // Nettoyer les références globales
-    if (window.poeticGenerator === this) {
-      delete window.poeticGenerator;
-      delete window.debugPoetic;
-      delete window.cleanupPoetic;
-    }
-    
+    // Réinitialiser l'état
+    this.managers = {};
     this.isInitialized = false;
     
     if (CONFIG.DEBUG.ENABLED) {
-      console.log('PoeticGenerator: Nettoyage terminé');
+      console.log('PoeticGenerator: Nettoyage complet effectué');
     }
   }
 }
-
-export default PoeticGenerator;

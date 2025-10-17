@@ -1,104 +1,128 @@
 /**
- * SHAREMANAGER.JS - VERSION OPTIMISÉE
- * Gestionnaire de partage et d'export
+ * Gestionnaire de partage et d'export (VERSION CORRIGÉE)
+ * Gère le partage sur les réseaux sociaux et la génération d'images
+ * @module ShareManager
  */
 
 import { CONFIG } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
 
 export class ShareManager {
-  constructor(combinationGenerator) {
-    if (!combinationGenerator) throw new Error('CombinationGenerator requis');
-    
-    this.combinationGenerator = combinationGenerator;
+  constructor() {
     this.capabilities = this.detectCapabilities();
-    this.shareHistory = [];
-    
+    this.shareActions = [];
     this.init();
-    
-    if (CONFIG.DEBUG.ENABLED) {
-      console.log('ShareManager initialized:', this.capabilities);
-    }
   }
   
   init() {
-    this.validateConfiguration();
     this.setupEventListeners();
+    if (CONFIG.DEBUG.ENABLED) {
+      console.log('ShareManager initialisé', this.capabilities);
+    }
   }
   
   detectCapabilities() {
     return {
-      clipboard: !!navigator.clipboard?.writeText,
-      nativeShare: !!navigator.share,
-      canvas: !!document.createElement('canvas').getContext,
-      download: !!document.createElement('a').download !== undefined,
-      popups: typeof window.open === 'function'
+      canvas: typeof HTMLCanvasElement !== 'undefined',
+      clipboard: typeof navigator.clipboard !== 'undefined',
+      share: typeof navigator.share !== 'undefined'
     };
   }
   
-  validateConfiguration() {
-    Object.entries(CONFIG.SHARE_URLS).forEach(([platform, url]) => {
-      try {
-        new URL(url + 'test');
-      } catch (error) {
-        console.warn(`URL invalide pour ${platform}:`, url);
-      }
-    });
-  }
-  
   setupEventListeners() {
-    document.addEventListener(CONFIG.EVENTS.COMBINATION_GENERATED, () => {
-      this.shareHistory = [];
+    const shareButtons = {
+      [CONFIG.DOM_ELEMENTS.SHARE_TWITTER]: () => this.shareOnTwitter(),
+      [CONFIG.DOM_ELEMENTS.SHARE_WHATSAPP]: () => this.shareOnWhatsApp(),
+      [CONFIG.DOM_ELEMENTS.SHARE_FACEBOOK]: () => this.shareOnFacebook(),
+      [CONFIG.DOM_ELEMENTS.SHARE_EMAIL]: () => this.shareByEmail(),
+      [CONFIG.DOM_ELEMENTS.GENERATE_IMAGE]: () => this.generateImage()
+    };
+    
+    Object.entries(shareButtons).forEach(([id, handler]) => {
+      const button = document.getElementById(id);
+      if (button) {
+        button.addEventListener('click', handler);
+      }
     });
   }
   
-  async copyToClipboard() {
-    const combination = this.getCombinationForSharing();
-    if (!combination) return;
+  getCombinationForSharing() {
+    const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
+    if (!resultElement || !resultElement.textContent.trim()) {
+      NotificationManager.error(CONFIG.MESSAGES.GENERATE_FIRST);
+      return null;
+    }
+    return resultElement.textContent.trim();
+  }
+  
+  getCurrentRating() {
+    const ratingInput = document.querySelector(CONFIG.DOM_ELEMENTS.RATING_CHECKED);
+    return ratingInput ? parseInt(ratingInput.value, 10) : null;
+  }
+  
+  getFormattedDateTime() {
+    return new Date().toLocaleDateString(
+      CONFIG.DATE_FORMAT.LOCALE, 
+      CONFIG.DATE_FORMAT.OPTIONS
+    );
+  }
+  
+  formatCombinationForSocial(combination, rating, platform) {
+    const ratingText = rating !== null ? ` (Note: ${rating}/10)` : '';
+    const baseText = `${combination}${ratingText}`;
     
-    try {
-      if (this.capabilities.clipboard) {
-        await navigator.clipboard.writeText(combination);
-        NotificationManager.success(CONFIG.MESSAGES.COMBINATION_COPIED);
-      } else {
-        this.fallbackCopyToClipboard(combination);
-      }
-      this.recordShareAction('clipboard', combination);
-    } catch (error) {
-      console.error('Erreur lors de la copie:', error);
-      NotificationManager.error(CONFIG.MESSAGES.COPY_ERROR);
-      this.fallbackCopyToClipboard(combination);
+    const hashtags = platform === 'twitter' ? ' #PoésieQuantique #LesÉditionsPhilopitre' : 
+                     platform === 'whatsapp' ? '\n\n Poésie Quantique - Les Éditions Philopitre' :
+                     '\n\n📚 Découvrez la Poésie Quantique avec Les Éditions Philopitre';
+    
+    return baseText + hashtags;
+  }
+  
+  formatCombinationForEmail(combination, rating) {
+    const ratingText = rating !== null ? `Note attribuée : ${rating}/10\n\n` : '';
+    return `Voici ma combinaison poétique générée :\n\n"${combination}"\n\n${ratingText}Découvrez la Poésie Quantique sur notre site !\n\n📚 Les Éditions Philopitre`;
+  }
+  
+  openShareWindow(url, title, width, height) {
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    const features = `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`;
+    window.open(url, title, features);
+  }
+  
+  isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+  
+  recordShareAction(platform, combination) {
+    this.shareActions.push({
+      platform,
+      combination,
+      timestamp: Date.now()
+    });
+    
+    if (CONFIG.DEBUG.ENABLED) {
+      console.log('Action de partage enregistrée:', platform);
     }
   }
   
-  fallbackCopyToClipboard(text) {
-    try {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.cssText = 'position:fixed;left:-999999px;top:-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      const successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      if (successful) {
-        NotificationManager.success(CONFIG.MESSAGES.COMBINATION_COPIED);
-      } else {
-        throw new Error('execCommand failed');
-      }
-    } catch (error) {
-      console.error('Fallback copie échoué:', error);
-      NotificationManager.error('Impossible de copier. Sélectionnez et copiez manuellement.');
+  copyToClipboard(text) {
+    if (!this.capabilities.clipboard) {
+      NotificationManager.error('Copie non supportée. Sélectionnez et copiez manuellement.');
+      return;
     }
+    
+    navigator.clipboard.writeText(text)
+      .then(() => NotificationManager.success(CONFIG.MESSAGES.COMBINATION_COPIED))
+      .catch(() => NotificationManager.error(CONFIG.MESSAGES.COPY_ERROR));
   }
   
   shareOnTwitter() {
     const combination = this.getCombinationForSharing();
     if (!combination) return;
     
-    const shareText = this.formatCombinationForSocial(combination, 'twitter');
+    const rating = this.getCurrentRating();
+    const shareText = this.formatCombinationForSocial(combination, rating, 'twitter');
     const url = CONFIG.SHARE_URLS.TWITTER + encodeURIComponent(shareText);
     this.openShareWindow(url, 'Twitter', 550, 420);
     this.recordShareAction('twitter', combination);
@@ -108,7 +132,8 @@ export class ShareManager {
     const combination = this.getCombinationForSharing();
     if (!combination) return;
     
-    const shareText = this.formatCombinationForSocial(combination, 'whatsapp');
+    const rating = this.getCurrentRating();
+    const shareText = this.formatCombinationForSocial(combination, rating, 'whatsapp');
     const url = CONFIG.SHARE_URLS.WHATSAPP + encodeURIComponent(shareText);
     
     if (this.isMobileDevice()) {
@@ -123,7 +148,8 @@ export class ShareManager {
     const combination = this.getCombinationForSharing();
     if (!combination) return;
     
-    const shareText = this.formatCombinationForSocial(combination, 'facebook');
+    const rating = this.getCurrentRating();
+    const shareText = this.formatCombinationForSocial(combination, rating, 'facebook');
     const url = CONFIG.SHARE_URLS.FACEBOOK + encodeURIComponent(shareText);
     this.openShareWindow(url, 'Facebook', 600, 400);
     this.recordShareAction('facebook', combination);
@@ -133,8 +159,9 @@ export class ShareManager {
     const combination = this.getCombinationForSharing();
     if (!combination) return;
     
+    const rating = this.getCurrentRating();
     const subject = 'Ma combinaison poétique';
-    const body = this.formatCombinationForEmail(combination);
+    const body = this.formatCombinationForEmail(combination, rating);
     const url = `${CONFIG.SHARE_URLS.EMAIL}${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
     try {
@@ -156,7 +183,18 @@ export class ShareManager {
     }
     
     try {
-      const canvas = this.createCombinationCanvas(combination);
+      const rating = this.getCurrentRating();
+      const dateTime = this.getFormattedDateTime();
+      
+      console.log('🖼️ ShareManager - Génération image:', {
+        combination,
+        rating,
+        ratingType: typeof rating,
+        dateTime,
+        hasRating: rating !== null && rating !== undefined
+      });
+      
+      const canvas = this.createCombinationCanvas(combination, rating, dateTime);
       this.downloadCanvasAsImage(canvas, CONFIG.EXPORT_FILE_NAMES.IMAGE);
       NotificationManager.success('Image générée et téléchargée avec succès');
       this.recordShareAction('image', combination);
@@ -166,7 +204,7 @@ export class ShareManager {
     }
   }
   
-  createCombinationCanvas(combination) {
+  createCombinationCanvas(combination, rating, dateTime) {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
     if (!context) throw new Error(CONFIG.MESSAGES.CANVAS_ERROR);
@@ -174,78 +212,214 @@ export class ShareManager {
     canvas.width = CONFIG.IMAGE_CONFIG.WIDTH;
     canvas.height = CONFIG.IMAGE_CONFIG.HEIGHT;
     
-    this.drawBackground(context, canvas);
+    // Dessiner tous les éléments
+    this.drawEnhancedBackground(context, canvas);
     this.drawCombinationText(context, canvas, combination);
-    this.drawWatermark(context, canvas);
+    
+    // TOUJOURS afficher la note si elle existe (même si 0)
+    if (rating !== null && rating !== undefined) {
+      console.log(`✅ Appel de drawEnhancedRating avec rating = ${rating}`);
+      this.drawEnhancedRating(context, canvas, rating);
+    } else {
+      console.warn('⚠️ Pas de note à afficher (rating est null ou undefined)');
+    }
+    
+    this.drawEnhancedDateTime(context, canvas, dateTime);
+    this.drawEnhancedWatermark(context, canvas);
     
     return canvas;
   }
   
-  drawBackground(context, canvas) {
-    const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#f8f9fa');
-    gradient.addColorStop(1, '#e9ecef');
-    
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    
-    context.strokeStyle = '#dee2e6';
-    context.lineWidth = 8;
-    context.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
-  }
+ drawEnhancedBackground(context, canvas) {
+  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#FAF3E0');
+  gradient.addColorStop(0.5, '#FFF8E7');
+  gradient.addColorStop(1, '#F5E6D3');
+  
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const borderGradient = context.createLinearGradient(0, 0, canvas.width, 0);
+  borderGradient.addColorStop(0, '#7A9E7E');
+  borderGradient.addColorStop(0.5, '#52796F');
+  borderGradient.addColorStop(1, '#84A98C');
+  
+  context.strokeStyle = borderGradient;
+  context.lineWidth = 12;
+  context.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+  
+  context.strokeStyle = '#B5C99A';
+  context.lineWidth = 3;
+  context.strokeRect(60, 60, canvas.width - 120, canvas.height - 120);
+}
   
   drawCombinationText(context, canvas, combination) {
-    context.fillStyle = CONFIG.IMAGE_CONFIG.TEXT_COLOR;
-    context.font = CONFIG.IMAGE_CONFIG.FONT_FAMILY;
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
+  context.fillStyle = '#4A4A3A';
+  context.font = 'italic 52px Georgia, serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  
+  const words = combination.split(' ');
+  const lines = this.wrapText(context, words, canvas.width - 200);
+  const lineHeight = 70;
+  const totalHeight = lines.length * lineHeight;
+  const startY = (canvas.height - totalHeight) / 2 - 50;
+  
+  lines.forEach((line, index) => {
+    const y = startY + index * lineHeight;
     
-    const words = combination.split(' ');
-    const lines = this.wrapText(context, words, canvas.width - CONFIG.IMAGE_CONFIG.PADDING * 2);
-    const lineHeight = CONFIG.IMAGE_CONFIG.LINE_HEIGHT;
-    const startY = (canvas.height - lines.length * lineHeight) / 2;
+    context.shadowColor = 'rgba(0, 0, 0, 0.1)';
+    context.shadowBlur = 4;
+    context.shadowOffsetX = 2;
+    context.shadowOffsetY = 2;
     
-    lines.forEach((line, index) => {
-      context.fillText(line, canvas.width / 2, startY + index * lineHeight);
-    });
+    context.fillText(line, canvas.width / 2, y);
+    
+    context.shadowColor = 'transparent';
+  });
+}
+  
+  drawEnhancedRating(context, canvas, rating) {
+  console.log('🎨 drawEnhancedRating appelée avec rating =', rating);
+  
+  // Calculer la position SOUS la combinaison
+  const words = this.getCurrentCombination().split(' ');
+  const lines = this.wrapText(context, words, canvas.width - 200);
+  const lineHeight = 70;
+  const totalHeight = lines.length * lineHeight;
+  const combinationEndY = ((canvas.height - totalHeight) / 2 - 50) + (lines.length * lineHeight);
+  
+  // Positionner la note 2-3 lignes sous la combinaison
+  const centerX = canvas.width / 2;
+  const y = combinationEndY + 150; // 2 lignes d'espacement
+  
+  // Créer un NOUVEAU contexte propre
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.shadowColor = 'transparent';
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.globalAlpha = 1.0;
+  context.filter = 'none';
+  
+  // Texte de la note simple et centré
+  context.font = 'bold 48px Georgia, serif';
+  context.fillStyle = '#4A4A3A';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  
+  const noteText = `Note : ${rating}/10`;
+  
+  // Ombre légère pour relief
+  context.shadowColor = 'rgba(0, 0, 0, 0.1)';
+  context.shadowBlur = 4;
+  context.shadowOffsetX = 2;
+  context.shadowOffsetY = 2;
+  
+  context.fillText(noteText, centerX, y);
+  
+  context.restore();
+  console.log('✅ Note affichée à y =', y);
   }
   
   wrapText(context, words, maxWidth) {
-    const lines = [];
-    let currentLine = '';
-    
-    for (let i = 0; i < words.length; i++) {
-      const testLine = currentLine + words[i] + ' ';
-      const metrics = context.measureText(testLine);
-      
-      if (metrics.width > maxWidth && i > 0) {
-        lines.push(currentLine.trim());
-        currentLine = words[i] + ' ';
-      } else {
-        currentLine = testLine;
-      }
-    }
-    
-    if (currentLine.trim()) lines.push(currentLine.trim());
-    return lines;
-  }
+  const lines = [];
+  let currentLine = '';
   
-  drawWatermark(context, canvas) {
-    context.font = '24px Arial';
-    context.fillStyle = '#6c757d';
-    context.textAlign = 'center';
-    context.textBaseline = 'bottom';
-    context.fillText('© Les éditions Philopitre', canvas.width / 2, canvas.height - 60);
+  words.forEach(word => {
+    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+    const metrics = context.measureText(testLine);
+    
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
+getCurrentCombination() {
+  const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
+  return resultElement ? resultElement.textContent.trim() : '';
+}
+  
+  drawEnhancedDateTime(context, canvas, dateTime) {
+  const centerX = canvas.width / 2;
+  const y = canvas.height - 220; // Monté plus haut (était à -180)
+  
+  const boxWidth = 400;
+  const boxHeight = 70;
+  const boxX = centerX - boxWidth / 2;
+  const boxY = y - boxHeight / 2;
+  
+  const boxGradient = context.createLinearGradient(boxX, boxY, boxX, boxY + boxHeight);
+  boxGradient.addColorStop(0, '#4A90E2');
+  boxGradient.addColorStop(1, '#357ABD');
+  
+  context.save();
+  context.fillStyle = boxGradient;
+  context.shadowColor = 'rgba(0, 0, 0, 0.2)';
+  context.shadowBlur = 15;
+  context.shadowOffsetY = 5;
+  this.roundRect(context, boxX, boxY, boxWidth, boxHeight, 20, true, false);
+  context.restore();
+  
+  context.save();
+  context.strokeStyle = '#fff';
+  context.lineWidth = 3;
+  this.roundRect(context, boxX, boxY, boxWidth, boxHeight, 20, false, true);
+  context.restore();
+  
+  context.save();
+  context.font = 'bold 22px Arial';
+  context.fillStyle = '#FFFFFF';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(dateTime, centerX, y);
+  context.restore();
+}
+  
+  drawEnhancedWatermark(context, canvas) {
+  const centerX = canvas.width / 2;
+  const y = canvas.height - 100; // Monté plus haut (était à -80)
+  
+  context.save();
+  context.font = 'bold 28px Georgia, serif';
+  context.fillStyle = '#8B4513';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('© Les Éditions Philopitre', centerX, y);
+  context.restore();  // "Poésie Quantique" retiré pour ne pas être caché par la ligne bleue
+}
+  
+  roundRect(context, x, y, width, height, radius, fill, stroke) {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    context.lineTo(x + width, y + height - radius);
+    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    context.lineTo(x + radius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    context.lineTo(x, y + radius);
+    context.quadraticCurveTo(x, y, x + radius, y);
+    context.closePath();
+    
+    if (fill) context.fill();
+    if (stroke) context.stroke();
   }
   
   downloadCanvasAsImage(canvas, filename) {
-    if (!this.capabilities.download) {
-      NotificationManager.error('Téléchargement non supporté sur ce navigateur');
-      return;
-    }
-    
-    canvas.toBlob((blob) => {
-      if (!blob) throw new Error('Impossible de créer l\'image');
+    canvas.toBlob(blob => {
+      if (!blob) {
+        NotificationManager.error('Erreur lors de la conversion en image');
+        return;
+      }
       
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -254,340 +428,7 @@ export class ShareManager {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-    }, 'image/png', 0.95);
-  }
-  
-  openShareWindow(url, name, width = 600, height = 400) {
-    if (!this.capabilities.popups) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-      return;
-    }
-    
-    try {
-      const left = (window.screen.width - width) / 2;
-      const top = (window.screen.height - height) / 2;
-      const features = `width=${width},height=${height},left=${left},top=${top},scrollbars=yes`;
-      
-      const popup = window.open(url, `share_${name}`, features);
-      if (!popup) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-        NotificationManager.warning('Popup bloquée. Ouverture dans un nouvel onglet.');
-      }
-    } catch (error) {
-      console.error('Erreur lors de l\'ouverture:', error);
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  }
-  
-  getCombinationForSharing() {
-    const combination = this.combinationGenerator.getCurrentCombination();
-    if (!combination || !this.combinationGenerator.isCombinationReady()) {
-      NotificationManager.warning(CONFIG.MESSAGES.GENERATE_FIRST);
-      return null;
-    }
-    return combination;
-  }
-  
-  formatCombinationForSocial(combination, platform) {
-    const baseText = `"${combination}"`;
-    
-    const formats = {
-      twitter: `${baseText} ✨ Généré avec le Générateur de Combinaisons Poétiques 🎭 #PoésieQuantique #EditionsPhilopitre`,
-      facebook: `${baseText}\n\n✨ Découvrez le Générateur de Combinaisons Poétiques !\n🎭 Une création des éditions Philopitre`,
-      whatsapp: `${baseText}\n\n🌟 Généré avec le Générateur de Combinaisons Poétiques\n© Les éditions Philopitre`
-    };
-    
-    return formats[platform] || baseText;
-  }
-  
-  formatCombinationForEmail(combination) {
-    return `Bonjour,
-
-Je souhaite partager avec vous cette combinaison poétique :
-
-"${combination}"
-
-Créée avec le Générateur de Combinaisons Poétiques des éditions Philopitre.
-
-Bonne découverte !
-
----
-Généré sur ${window.location.href}`;
-  }
-  
-  isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
-  }
-  
-  recordShareAction(platform, combination) {
-    this.shareHistory.push({
-      platform,
-      combination: combination.substring(0, 50) + '...',
-      timestamp: Date.now(),
-      isMobile: this.isMobileDevice()
-    });
-    
-    if (this.shareHistory.length > 50) this.shareHistory.shift();
-  }
-  
-  validate() {
-    return {
-      isValid: !!this.combinationGenerator,
-      capabilities: this.capabilities,
-      shareHistoryLength: this.shareHistory.length
-    };
-  }
-  
-  getDebugInfo() {
-    return {
-      capabilities: this.capabilities,
-      shareHistory: this.shareHistory.length,
-      validation: this.validate()
-    };
-  }
-  
-  cleanup() {
-    this.shareHistory = [];
-    if (CONFIG.DEBUG.ENABLED) console.log('ShareManager: Nettoyage effectué');
+      URL.revokeObjectURL(url);
+    }, 'image/png');
   }
 }
-
-/**
- * ORDINATIONMANAGER.JS - VERSION OPTIMISÉE
- * Gestionnaire d'ordination des mots
- */
-
-export class OrdinationManager {
-  constructor(audioManager) {
-    if (!audioManager) throw new Error('AudioManager requis');
-    
-    this.audioManager = audioManager;
-    this.currentOrdination = 'original';
-    this.wordListElement = null;
-    this.toggleButton = null;
-    
-    this.ordinations = {
-      original: {
-        name: 'Ordination Originale',
-        words: [
-          { text: "Je", group: 1 },
-          { text: "suis", group: 1 },
-          { text: "rêveur", group: 2 },
-          { text: "professionnel", group: 1 },
-          { text: "dans", group: 1 },
-          { text: "mon", group: 2 },
-          { text: "métier", group: 2 },
-          { text: "exceptionnel", group: 2 },
-          { text: "l'erreur", group: 1 },
-          { text: "en", group: 1 },
-          { text: "tout", group: 1 },
-          { text: "genre", group: 1 },
-          { text: "est", group: 2 },
-          { text: "proscrite", group: 1 },
-          { text: "la", group: 1 },
-          { text: "souveraine", group: 1 },
-          { text: "intelligence", group: 1 },
-          { text: "pour", group: 2 },
-          { text: "moi-même", group: 2 },
-          { text: "grandissant", group: 2 }
-        ]
-      },
-      alternative: {
-        name: 'Ordination Alternative',
-        words: [
-          { text: "Je", group: 1 },
-          { text: "suis", group: 1 },
-          { text: "professionnel", group: 1 },
-          { text: "dans", group: 1 },
-          { text: "l'erreur", group: 1 },
-          { text: "en", group: 1 },
-          { text: "tout", group: 1 },
-          { text: "genre", group: 1 },
-          { text: "proscrite", group: 1 },
-          { text: "la", group: 1 },
-          { text: "souveraine", group: 1 },
-          { text: "intelligence", group: 1 },
-          { text: "Rêveur", group: 2, dataWord: "rêveur" },
-          { text: "mon", group: 2 },
-          { text: "métier", group: 2 },
-          { text: "exceptionnel", group: 2 },
-          { text: "est", group: 2 },
-          { text: "pour", group: 2 },
-          { text: "moi-même", group: 2 },
-          { text: "grandissant", group: 2 }
-        ]
-      }
-    };
-    
-    this.init();
-    if (CONFIG.DEBUG.ENABLED) console.log('OrdinationManager initialized');
-  }
-  
-  init() {
-    this.setupDOMReferences();
-    this.createToggleButton();
-    this.setupEventListeners();
-    this.loadSavedOrdination();
-  }
-  
-  setupDOMReferences() {
-    this.wordListElement = document.getElementById(CONFIG.DOM_ELEMENTS.WORD_LIST);
-    if (!this.wordListElement) console.error('Liste de mots non trouvée');
-  }
-  
-  createToggleButton() {
-    const controlsTop = document.querySelector('.controls-top');
-    if (!controlsTop) {
-      console.error('Conteneur de contrôles non trouvé');
-      return;
-    }
-    
-    this.toggleButton = document.createElement('button');
-    this.toggleButton.id = 'toggleOrdination';
-    this.toggleButton.className = 'secondary';
-    this.toggleButton.innerHTML = '🔄 Permuter l\'ordre';
-    this.toggleButton.setAttribute('aria-label', 'Permuter entre les deux ordinations des mots');
-    controlsTop.appendChild(this.toggleButton);
-  }
-  
-  setupEventListeners() {
-    if (this.toggleButton) {
-      this.toggleButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.toggleOrdination();
-      });
-    }
-  }
-  
-  loadSavedOrdination() {
-    try {
-      const saved = localStorage.getItem(CONFIG.STORAGE.ORDINATION_KEY || 'poeticOrdination');
-      if (saved && ['original', 'alternative'].includes(saved)) {
-        this.currentOrdination = saved;
-      }
-      this.applyOrdination(this.currentOrdination, false);
-    } catch (error) {
-      console.error('Erreur lors du chargement:', error);
-    }
-  }
-  
-  saveOrdination() {
-    try {
-      localStorage.setItem(CONFIG.STORAGE.ORDINATION_KEY || 'poeticOrdination', this.currentOrdination);
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-    }
-  }
-  
-  toggleOrdination() {
-    const newOrdination = this.currentOrdination === 'original' ? 'alternative' : 'original';
-    this.addTransitionEffect();
-    
-    setTimeout(() => {
-      this.applyOrdination(newOrdination, true);
-      this.currentOrdination = newOrdination;
-      this.saveOrdination();
-      this.updateButtonDisplay();
-      this.playToggleSound();
-      NotificationManager.show(`Basculé vers : ${this.ordinations[newOrdination].name}`);
-    }, 150);
-  }
-  
-  applyOrdination(ordinationType, animate = false) {
-    if (!this.ordinations[ordinationType]) {
-      console.error('Ordination inconnue:', ordinationType);
-      return;
-    }
-    
-    const ordination = this.ordinations[ordinationType];
-    const wordsHTML = this.generateWordsHTML(ordination.words);
-    
-    if (animate) {
-      this.wordListElement.style.opacity = '0';
-      setTimeout(() => {
-        this.updateWordListContent(wordsHTML);
-        this.wordListElement.style.opacity = '1';
-      }, 150);
-    } else {
-      this.updateWordListContent(wordsHTML);
-    }
-  }
-  
-  generateWordsHTML(words) {
-    const wordsSpans = words.map(word => {
-      const groupClass = `word-group-${word.group}`;
-      const dataWordValue = word.dataWord || word.text;
-      return `<span class="${groupClass}" data-word="${dataWordValue}" role="checkbox" aria-checked="true" tabindex="0">${word.text}</span>`;
-    }).join('\n          ');
-    
-    return `<span class="word-list-label">Mots disponibles :</span>\n          ${wordsSpans}`;
-  }
-  
-  updateWordListContent(htmlContent) {
-    this.wordListElement.innerHTML = htmlContent;
-    this.dispatchOrdinationChangeEvent();
-  }
-  
-  addTransitionEffect() {
-    if (this.wordListElement) {
-      this.wordListElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-      this.wordListElement.style.transform = 'scale(0.98)';
-      setTimeout(() => this.wordListElement.style.transform = 'scale(1)', 300);
-    }
-  }
-  
-  updateButtonDisplay() {
-    if (!this.toggleButton) return;
-    
-    const nextOrdination = this.currentOrdination === 'original' ? 'alternative' : 'original';
-    const nextName = this.ordinations[nextOrdination].name;
-    this.toggleButton.innerHTML = `🔄 Vers ${nextName.replace('Ordination ', '')}`;
-  }
-  
-  playToggleSound() {
-    if (this.audioManager && this.audioManager.isSoundEnabled()) {
-      try {
-        this.audioManager.playSound({ volume: 0.2, playbackRate: 1.5 });
-      } catch (error) {
-        if (CONFIG.DEBUG.ENABLED) console.warn('Erreur lors de la lecture du son:', error);
-      }
-    }
-  }
-  
-  dispatchOrdinationChangeEvent() {
-    document.dispatchEvent(new CustomEvent('ordinationChanged', {
-      detail: {
-        currentOrdination: this.currentOrdination,
-        ordinationName: this.ordinations[this.currentOrdination].name,
-        timestamp: Date.now()
-      }
-    }));
-  }
-  
-  getCurrentOrdination() {
-    return this.currentOrdination;
-  }
-  
-  validate() {
-    const issues = [];
-    if (!this.wordListElement) issues.push('Liste de mots manquante');
-    if (!this.toggleButton) issues.push('Bouton de basculement manquant');
-    return { isValid: issues.length === 0, issues };
-  }
-  
-  getDebugInfo() {
-    return {
-      currentOrdination: this.currentOrdination,
-      validation: this.validate()
-    };
-  }
-  
-  cleanup() {
-    if (this.toggleButton) this.toggleButton.removeEventListener('click', () => {});
-    if (CONFIG.DEBUG.ENABLED) console.log('OrdinationManager: Nettoyage effectué');
-  }
-}
-
-export default { ShareManager, OrdinationManager };
