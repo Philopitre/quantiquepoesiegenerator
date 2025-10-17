@@ -196,7 +196,7 @@ export class PoeticGenerator {
   handleResetCache() {
     if (confirm('⚠️ Êtes-vous sûr de vouloir réinitialiser tout l\'historique ? Cette action est irréversible.')) {
       try {
-        this.managers.history.clearHistory();
+        this.managers.history.clear();
         NotificationManager.success('Historique réinitialisé avec succès');
       } catch (error) {
         console.error('Erreur lors de la réinitialisation:', error);

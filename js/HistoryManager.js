@@ -491,6 +491,20 @@ export class HistoryManager {
       console.log('HistoryManager: Nettoyage effectué');
     }
   }
+  /**
+ * Réinitialise complètement l'historique
+ * Vide toutes les entrées et met à jour l'affichage
+ */
+clear() {
+  this.history = [];
+  this.saveHistory();
+  this.updateDisplay();
+  this.notifyObservers();
+  
+  if (CONFIG.DEBUG.ENABLED) {
+    console.log('HistoryManager: Historique réinitialisé');
+  }
+}
 }
 
 export default HistoryManager;
