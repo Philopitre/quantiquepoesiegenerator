@@ -286,16 +286,47 @@ export class RatingManager {
     const selectedInput = document.querySelector(CONFIG.DOM_ELEMENTS.RATING_CHECKED);
     return selectedInput ? parseInt(selectedInput.value) : null;
   }
+  /**
+ * Met à jour l'affichage du résultat avec la note
+ * La note doit apparaître CENTRÉE SOUS le texte de la combinaison
+ */
+/**
+ * Met à jour l'affichage du résultat avec la note
+ * La note doit apparaître CENTRÉE SOUS le texte de la combinaison
+ * avec un espacement important (plusieurs lignes)
+ */
+updateResultDisplay(combination, rating) {
+  const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
+  if (!resultElement) return;
   
-  updateResultDisplay(combination, rating) {
-    const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
-    if (resultElement) {
-      const ratedText = `${combination} (Note : ${rating}/10)`;
-      resultElement.textContent = ratedText;
-      resultElement.classList.add('rated');
-      setTimeout(() => resultElement.classList.remove('rated'), 1000);
+  const cleanCombination = combination.replace(/\s*\(Note\s*:\s*\d+\/10\)\s*$/i, '').trim();
+  
+  // ✅ SOLUTION : Utiliser un conteneur avec display: flex et column-gap
+  resultElement.innerHTML = `
+    <div class="result-content">
+      <div class="result-text">${cleanCombination}</div>
+      <div class="result-rating new">${rating}/10</div>
+    </div>
+  `;
+  
+  resultElement.classList.add('rated');
+  
+  setTimeout(() => {
+    resultElement.classList.remove('rated');
+    const ratingDiv = resultElement.querySelector('.result-rating');
+    if (ratingDiv) {
+      ratingDiv.classList.remove('new');
     }
+  }, 1000);
+  
+  if (CONFIG.DEBUG.ENABLED) {
+    console.log('✅ Affichage mis à jour:', {
+      combinaison: cleanCombination,
+      note: rating,
+      structure: 'vertical avec flexbox'
+    });
   }
+}
   
   enableRating() {
     this.isRatingEnabled = true;

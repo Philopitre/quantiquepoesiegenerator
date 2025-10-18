@@ -79,9 +79,10 @@ export class ShareManager {
   }
   
   formatCombinationForEmail(combination, rating) {
-    const ratingText = rating !== null ? `Note attribuée : ${rating}/10\n\n` : '';
-    return `Voici ma combinaison poétique générée :\n\n"${combination}"\n\n${ratingText}Découvrez la Poésie Quantique sur notre site !\n\n📚 Les Éditions Philopitre`;
-  }
+  const ratingText = rating !== null ? `Note attribuée : ${rating}/10\n\n` : '';
+  return `Voici ma combinaison poétique générée :\n\n"${combination}"\n\n${ratingText}Découvrez la Poésie Quantique sur notre site !\n\n📚 Les Éditions Philopitre`;
+  // ↑ Ajout du guillemet fermant manquant
+}
   
   openShareWindow(url, title, width, height) {
     const left = (screen.width - width) / 2;
@@ -282,18 +283,20 @@ export class ShareManager {
   drawEnhancedRating(context, canvas, rating) {
   console.log('🎨 drawEnhancedRating appelée avec rating =', rating);
   
-  // Calculer la position SOUS la combinaison
-  const words = this.getCurrentCombination().split(' ');
-  const lines = this.wrapText(context, words, canvas.width - 200);
-  const lineHeight = 70;
-  const totalHeight = lines.length * lineHeight;
-  const combinationEndY = ((canvas.height - totalHeight) / 2 - 50) + (lines.length * lineHeight);
+  // NOUVELLE APPROCHE : Placer la note aux 2/3 de la hauteur totale du canvas
+  // Canvas height = 1080
+  // 2/3 de 1080 = 720
   
-  // Positionner la note 2-3 lignes sous la combinaison
-  const centerX = canvas.width / 2;
-  const y = combinationEndY + 150; // 2 lignes d'espacement
+  const centerX = canvas.width / 2;   // 540
+  const noteY = (canvas.height * 2) / 3;  // 1080 * 2/3 = 720
   
-  // Créer un NOUVEAU contexte propre
+  console.log('📐 Position note:', {
+    canvasHeight: canvas.height,
+    noteY: noteY,
+    position: '2/3 de la hauteur'
+  });
+  
+  // Créer un contexte propre
   context.save();
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.shadowColor = 'transparent';
@@ -303,7 +306,7 @@ export class ShareManager {
   context.globalAlpha = 1.0;
   context.filter = 'none';
   
-  // Texte de la note simple et centré
+  // Texte de la note
   context.font = 'bold 48px Georgia, serif';
   context.fillStyle = '#4A4A3A';
   context.textAlign = 'center';
@@ -317,11 +320,11 @@ export class ShareManager {
   context.shadowOffsetX = 2;
   context.shadowOffsetY = 2;
   
-  context.fillText(noteText, centerX, y);
+  context.fillText(noteText, centerX, noteY);
   
   context.restore();
-  console.log('✅ Note affichée à y =', y);
-  }
+  console.log('✅ Note affichée à Y = 720 (2/3 de 1080)');
+}
   
   wrapText(context, words, maxWidth) {
   const lines = [];

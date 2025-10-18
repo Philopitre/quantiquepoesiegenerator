@@ -1,0 +1,375 @@
+/* ===================================
+   STYLES SPÉCIFIQUES POUR COMPOSE-POEM
+   =================================== */
+
+.header {
+  text-align: center;
+  margin: 2rem 0 3rem 0;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: var(--forest);
+  margin-bottom: 0.5rem;
+}
+
+.header .subtitle {
+  font-size: 1.1rem;
+  color: var(--moss);
+  margin: 0;
+}
+
+/* Layout principal */
+.composer-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Banque de mots */
+.word-bank {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px var(--shadow-light);
+  max-height: 80vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 100px;
+}
+
+.word-bank h2 {
+  font-size: 1.2rem;
+  color: var(--forest);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.word-bank-instructions {
+  font-size: 0.85rem;
+  color: var(--moss);
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.word-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.word-item {
+  padding: 0.5rem 0.9rem;
+  margin: 0;
+  border-radius: 12px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  user-select: none;
+  box-shadow: 0 2px 6px var(--shadow-light);
+  border: 2px solid transparent;
+}
+
+/* Groupes de mots avec les mêmes styles que generator.html */
+.word-item.word-group-1 {
+  font-family: 'Georgia', serif;
+  font-weight: 600;
+  font-style: italic;
+  background: linear-gradient(135deg, var(--forest) 0%, var(--primary-color) 100%);
+  color: white;
+  letter-spacing: 0.3px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.word-item.word-group-2 {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--terracotta) 100%);
+  color: white;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.word-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px var(--shadow-medium);
+}
+
+.word-item:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.word-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+/* Zone de canvas */
+.canvas-area {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  min-height: 500px;
+  box-shadow: 0 4px 20px var(--shadow-light);
+}
+
+.canvas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--sage);
+}
+
+.canvas-header h2 {
+  font-size: 1.5rem;
+  color: var(--forest);
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 0.8rem;
+}
+
+/* Tableau blanc */
+.whiteboard {
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+  border: 2px dashed var(--sage);
+  border-radius: var(--border-radius);
+  min-height: 600px;
+  padding: 2rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.whiteboard.drag-over {
+  border-color: var(--accent-color);
+  background: var(--cream);
+  box-shadow: inset 0 0 20px rgba(244, 162, 97, 0.2);
+}
+
+.whiteboard-placeholder {
+  text-align: center;
+  color: var(--moss);
+  padding: 3rem 2rem;
+  opacity: 0.6;
+  display: none;
+}
+
+.whiteboard-placeholder.show {
+  display: block;
+}
+
+.whiteboard-placeholder span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.whiteboard-placeholder p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Mots placés sur le canvas */
+.placed-word {
+  position: absolute;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  cursor: move;
+  user-select: none;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 1;
+  border: 2px solid transparent;
+  /* Hauteur fixe pour cohérence */
+  min-height: 40px;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placed-word.word-group-1 {
+  font-family: 'Georgia', serif;
+  font-weight: 600;
+  font-style: italic;
+  background: linear-gradient(135deg, var(--forest) 0%, var(--primary-color) 100%);
+  color: white;
+  letter-spacing: 0.3px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.placed-word.word-group-2 {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--terracotta) 100%);
+  color: white;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.placed-word:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px var(--shadow-dark);
+  z-index: 2;
+}
+
+.placed-word:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+/* CORRECTION : Bouton de suppression avec position FIXE */
+.placed-word .remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  background: var(--terracotta);
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  line-height: 1;
+  z-index: 15;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+.placed-word .remove-btn:hover {
+  background: #d45a3f;
+  transform: scale(1.3);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* S'assurer que le mot ne bloque pas le bouton */
+.placed-word {
+  pointer-events: auto;
+}
+
+/* Résultat du poème */
+.poem-output {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: var(--cream);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--accent-color);
+}
+
+.poem-output h3 {
+  color: var(--forest);
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.poem-help {
+  font-size: 0.85rem;
+  color: var(--moss);
+  margin-bottom: 1rem;
+  opacity: 0.9;
+}
+
+.poem-text {
+  font-size: 1.3rem;
+  line-height: 2;
+  color: var(--forest);
+  font-style: italic;
+  min-height: 2.5em;
+  padding: 1rem;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.poem-text.empty {
+  color: var(--moss);
+  opacity: 0.6;
+  font-style: normal;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .composer-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .word-bank {
+    max-height: none;
+    position: static;
+    order: 2;
+  }
+
+  .canvas-area {
+    order: 1;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .whiteboard {
+    min-height: 400px;
+  }
+
+  .placed-word .remove-btn {
+    top: -6px;
+    right: -6px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+
+  .placed-word .remove-btn {
+    top: -6px;
+    right: -6px;
+    font-size: 1.2rem;
+  }
+}

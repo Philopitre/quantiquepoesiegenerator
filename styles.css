@@ -632,6 +632,9 @@ button.secondary:hover {
 /* ===================================
    RÉSULTAT - PAGE GENERATOR
    =================================== */
+/* ===================================
+   RÉSULTAT - Affichage de la combinaison
+   =================================== */
 .result {
   background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
   color: var(--text-color);
@@ -641,7 +644,7 @@ button.secondary:hover {
   line-height: 1.8;
   padding: 30px;
   margin: 20px auto;
-  min-height: 80px;
+  min-height: 120px;
   border: 3px solid var(--moss);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 12px 30px var(--shadow-medium);
@@ -650,6 +653,7 @@ button.secondary:hover {
   user-select: none;
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
 
 .result::before {
@@ -661,6 +665,7 @@ button.secondary:hover {
   height: 200%;
   background: radial-gradient(circle, rgba(181, 201, 154, 0.15) 0%, transparent 70%);
   animation: float 6s ease-in-out infinite;
+  z-index: 0;
 }
 
 @keyframes float {
@@ -681,6 +686,59 @@ button.secondary:hover {
   border-color: var(--forest);
 }
 
+/* Conteneur principal qui organise texte + note verticalement */
+.result-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  /* Espacement entre texte et note */
+  min-height: 200px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Texte de la combinaison */
+.result-content .result-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  line-height: 1.8;
+}
+
+/* Note affichée sous le texte */
+.result-content .result-rating {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--white);
+  padding: 10px 30px;
+  background: linear-gradient(135deg, var(--forest) 0%, var(--moss) 100%);
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(82, 121, 111, 0.35);
+  white-space: nowrap;
+}
+
+/* Animation quand la note est ajoutée */
+.result-content .result-rating.new {
+  animation: slideInUp 0.5s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Curseur animé pour l'effet typewriter */
 .cursor {
   display: inline-block;
   width: 3px;
@@ -699,6 +757,106 @@ button.secondary:hover {
 @keyframes blink {
   50% {
     opacity: 0;
+  }
+}
+
+/* Responsive - ajuster sur mobile */
+@media (max-width: 480px) {
+  .result {
+    font-size: 1rem;
+    padding: 20px;
+    min-height: 100px;
+  }
+  
+  .result-text {
+    font-size: 1rem;
+    margin: 0 0 60px 0;
+  }
+  
+  .result-rating {
+    font-size: 0.9rem;
+    padding: 8px 20px;
+  }
+}
+
+/* Curseur animé pour l'effet typewriter */
+.cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.2em;
+  background: linear-gradient(180deg, var(--forest) 0%, var(--accent-color) 100%);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 1s steps(1) infinite;
+  border-radius: 2px;
+}
+
+.cursor.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Responsive - ajuster sur mobile */
+@media (max-width: 480px) {
+  .result {
+    font-size: 1rem;
+    padding: 20px;
+    min-height: 100px;
+  }
+
+  .result-text {
+    font-size: 1rem;
+  }
+
+  .result-rating {
+    font-size: 0.9rem;
+    margin-top: 20px;
+    padding: 8px 20px;
+  }
+}
+
+/* Curseur animé pour l'effet typewriter */
+.cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.2em;
+  background: linear-gradient(180deg, var(--forest) 0%, var(--accent-color) 100%);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 1s steps(1) infinite;
+  border-radius: 2px;
+}
+
+.cursor.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Responsive - ajuster sur mobile */
+@media (max-width: 480px) {
+  .result {
+    font-size: 1rem;
+    padding: 20px;
+  }
+
+  .result-text {
+    font-size: 1rem !important;
+  }
+
+  .result-rating {
+    font-size: 0.9rem;
+    margin-top: 25px !important;
+    padding: 8px 20px;
   }
 }
 
