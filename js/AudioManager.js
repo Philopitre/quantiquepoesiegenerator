@@ -6,6 +6,7 @@
 
 import { CONFIG } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
+import { safeLocalStorageGet } from './config.js';
 
 export class AudioManager {
   constructor() {
@@ -85,14 +86,8 @@ export class AudioManager {
   }
   
   loadSoundPreference() {
-    try {
-      const saved = localStorage.getItem(CONFIG.STORAGE.SOUND_KEY);
-      return saved !== null ? JSON.parse(saved) : true;
-    } catch (error) {
-      console.error('Erreur lors du chargement des préférences:', error);
-      return true;
-    }
-  }
+  return safeLocalStorageGet(CONFIG.STORAGE.SOUND_KEY, true);
+}
   
   saveSoundPreference() {
     try {

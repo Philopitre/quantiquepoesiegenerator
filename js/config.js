@@ -257,6 +257,75 @@ const BASE_CONFIG = {
   get USER_PREFERENCES_KEY() { return this.STORAGE.PREFERENCES_KEY; }
 };
 
+// ===================================
+// UTILITAIRES LOCALSTORAGE (RÉUTILISABLES)
+// ===================================
+
+/**
+ * Charge une valeur depuis localStorage avec gestion d'erreur
+ * @param {string} key - Clé de stockage
+ * @param {*} defaultValue - Valeur par défaut
+ * @returns {*} Valeur chargée ou valeur par défaut
+ */
+const safeLocalStorageGet = (key, defaultValue = null) => {
+  if (typeof localStorage === 'undefined') {
+    return defaultValue;
+  }
+  
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    if (CONFIG?.DEBUG?.ENABLED) {
+      console.warn(`Erreur lecture localStorage[${key}]:`, error);
+    }
+    return defaultValue;
+  }
+};
+
+/**
+ * Sauvegarde une valeur dans localStorage avec gestion d'erreur
+ * @param {string} key - Clé de stockage
+ * @param {*} value - Valeur à sauvegarder
+ * @returns {boolean} Succès ou échec
+ */
+const safeLocalStorageSet = (key, value) => {
+  if (typeof localStorage === 'undefined') {
+    return false;
+  }
+  
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    if (CONFIG?.DEBUG?.ENABLED) {
+      console.error(`Erreur écriture localStorage[${key}]:`, error);
+    }
+    return false;
+  }
+};
+
+/**
+ * Supprime une valeur de localStorage avec gestion d'erreur
+ * @param {string} key - Clé de stockage
+ * @returns {boolean} Succès ou échec
+ */
+const safeLocalStorageRemove = (key) => {
+  if (typeof localStorage === 'undefined') {
+    return false;
+  }
+  
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch (error) {
+    if (CONFIG?.DEBUG?.ENABLED) {
+      console.error(`Erreur suppression localStorage[${key}]:`, error);
+    }
+    return false;
+  }
+};
+
 // Validation de la configuration
 const validateConfig = (config) => {
   const errors = [];
@@ -281,31 +350,28 @@ const validateConfig = (config) => {
 let CONFIG;
 
 try {
-  let userConfig = {};
-  if (typeof localStorage !== 'undefined') {
-    try {
-      const stored = localStorage.getItem('poeticConfig');
-      if (stored) userConfig = JSON.parse(stored);
-    } catch (error) {
-      console.warn('Impossible de charger la configuration utilisateur:', error);
-    }
-  }
+  // ✅ AMÉLIORATION 1 : Utiliser l'utilitaire
+  const userConfig = safeLocalStorageGet('poeticConfig', {});
+  
+  // Merge avec la config de base
+  CONFIG = { ...BASE_CONFIG, ...userConfig };
 
-  CONFIG = Object.assign({}, BASE_CONFIG, userConfig);
-
+  // ✅ AMÉLIORATION 2 : Validation TOUJOURS active (version allégée)
   const validation = validateConfig(CONFIG);
   
   if (!validation.isValid) {
-    console.error('Erreurs de configuration:', validation.errors);
-    throw new Error(`Configuration invalide: ${validation.errors.join(', ')}`);
+    console.error('Configuration invalide:', validation.errors);
+    // En production, fallback sur BASE_CONFIG
+    CONFIG = BASE_CONFIG;
+    console.warn('Utilisation de la configuration par défaut');
   }
 
-  if (validation.warnings.length > 0) {
+  if (validation.warnings.length > 0 && CONFIG.DEBUG?.ENABLED) {
     console.warn('Avertissements de configuration:', validation.warnings);
   }
 
 } catch (error) {
-  console.error('Erreur lors de l\'initialisation de la configuration:', error);
+  console.error('Erreur critique lors de l\'initialisation:', error);
   CONFIG = BASE_CONFIG;
 }
 
@@ -330,7 +396,42 @@ CONFIG.resetConfig = function() {
 };
 
 // Freeze de l'objet CONFIG
+// ===================================
+// UTILITAIRES DE CONFIGURATION
+// ===================================
+
+/**
+ * Sauvegarde la configuration utilisateur
+ * @param {Object} userConfig - Configuration à sauvegarder
+ * @returns {boolean} Succès ou échec
+ */
+const saveUserConfig = (userConfig) => {
+  return safeLocalStorageSet('poeticConfig', userConfig);
+};
+
+/**
+ * Réinitialise la configuration utilisateur
+ * @returns {boolean} Succès ou échec
+ */
+const resetUserConfig = () => {
+  const success = safeLocalStorageRemove('poeticConfig');
+  if (success && typeof window !== 'undefined') {
+    window.location.reload();
+  }
+  return success;
+};
+
+// Freeze de l'objet CONFIG (data seulement)
 Object.freeze(CONFIG);
 
-export { CONFIG };
+// ✅ AMÉLIORATION 3 : Exporter séparément config et utilitaires
+export { 
+  CONFIG, 
+  saveUserConfig, 
+  resetUserConfig,
+  safeLocalStorageGet,
+  safeLocalStorageSet,
+  safeLocalStorageRemove
+};
+
 export default CONFIG;

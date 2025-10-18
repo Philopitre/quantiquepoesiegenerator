@@ -176,49 +176,56 @@ export class CombinationGenerator {
   }
   
   animateResult(text) {
-    const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
-    
-    if (!resultElement) {
-      console.error('Élément de résultat non trouvé');
-      this.isGenerating = false;
+  const resultElement = document.getElementById(CONFIG.DOM_ELEMENTS.RESULT);
+  
+  if (!resultElement) {
+    console.error('Élément de résultat non trouvé');
+    this.isGenerating = false;
+    return;
+  }
+  
+  this.stopCurrentAnimation();
+  
+  // Vider proprement
+  resultElement.textContent = '';
+  resultElement.setAttribute('aria-busy', 'true');
+  
+  // Créer le span de texte principal
+  const textSpan = document.createElement('span');
+  textSpan.className = 'animated-text';
+  
+  const cursor = this.createCursor();
+  resultElement.appendChild(textSpan);
+  resultElement.appendChild(cursor);
+  
+  let characterIndex = 0;
+  const audioConfigBase = { volume: 0.5 };
+  
+  const animateNextCharacter = () => {
+    if (characterIndex >= text.length) {
+      this.onAnimationComplete(resultElement, cursor);
       return;
     }
     
-    this.stopCurrentAnimation();
+    const character = text[characterIndex];
     
-    // Vider le contenu texte tout en gardant les nœuds enfants
-    while (resultElement.firstChild) {
-      resultElement.removeChild(resultElement.firstChild);
+    // ✨ SUPER OPTIMISATION : Modifier directement textContent
+    textSpan.textContent += character;
+    
+    // Audio uniquement pour les caractères visibles
+    if (character !== ' ') {
+      this.audioManager.playSound({
+        ...audioConfigBase,
+        playbackRate: 1 + Math.random() * 0.2 - 0.1
+      });
     }
     
-    resultElement.setAttribute('aria-busy', 'true');
-    
-    let characterIndex = 0;
-    const cursor = this.createCursor();
-    resultElement.appendChild(cursor);
-    
-    const animateNextCharacter = () => {
-      if (characterIndex < text.length) {
-        const character = text[characterIndex];
-        const textNode = document.createTextNode(character);
-        cursor.parentNode.insertBefore(textNode, cursor);
-        
-        if (character !== ' ') {
-          this.audioManager.playSound({
-            volume: 0.5,
-            playbackRate: 1 + (Math.random() * 0.2 - 0.1)
-          });
-        }
-        
-        characterIndex++;
-        this.animationTimeout = setTimeout(animateNextCharacter, CONFIG.ANIMATION.DELAY);
-      } else {
-        this.onAnimationComplete(resultElement, cursor);
-      }
-    };
-    
-    animateNextCharacter();
-  }
+    characterIndex++;
+    this.animationTimeout = setTimeout(animateNextCharacter, CONFIG.ANIMATION.DELAY);
+  };
+  
+  animateNextCharacter();
+}
   
   createCursor() {
     const cursor = document.createElement('span');

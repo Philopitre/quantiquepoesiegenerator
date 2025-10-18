@@ -17,6 +17,7 @@ export class WordManager {
     this.wordElements = [];
     this.wordListElement = null;
     this.counterElement = null;
+    this.eventHandlers = new Map();
     
     this.init();
     
@@ -64,22 +65,36 @@ export class WordManager {
   
   attachWordEventListeners() {
     this.wordElements.forEach(element => {
-      const newElement = element.cloneNode(true);
-      element.parentNode.replaceChild(newElement, element);
+      // ✅ ÉTAPE 1 : Supprimer les anciens handlers si existants
+      const oldHandlers = this.eventHandlers.get(element);
+      if (oldHandlers) {
+        element.removeEventListener('click', oldHandlers.click);
+        element.removeEventListener('keydown', oldHandlers.keydown);
+      }
       
-      newElement.addEventListener('click', (e) => this.handleWordClick(e));
-      newElement.addEventListener('keydown', (e) => this.handleWordKeydown(e));
+      // ✅ ÉTAPE 2 : Créer les nouveaux handlers
+      const clickHandler = (e) => this.handleWordClick(e);
+      const keydownHandler = (e) => this.handleWordKeydown(e);
       
-      newElement.setAttribute('tabindex', '0');
-      newElement.setAttribute('role', 'checkbox');
+      // ✅ ÉTAPE 3 : Attacher les nouveaux handlers
+      element.addEventListener('click', clickHandler);
+      element.addEventListener('keydown', keydownHandler);
       
-      const word = newElement.getAttribute('data-word');
+      // ✅ ÉTAPE 4 : Sauvegarder pour futur nettoyage
+      this.eventHandlers.set(element, {
+        click: clickHandler,
+        keydown: keydownHandler
+      });
+      
+      // ✅ ÉTAPE 5 : Mettre à jour les attributs (sans toucher au DOM)
+      element.setAttribute('tabindex', '0');
+      element.setAttribute('role', 'checkbox');
+      
+      const word = element.getAttribute('data-word');
       const isSelected = this.selectedWords.has(word);
-      newElement.setAttribute('aria-checked', isSelected.toString());
-      newElement.classList.toggle(CONFIG.CSS_CLASSES.WORD_HIDDEN, !isSelected);
+      element.setAttribute('aria-checked', isSelected.toString());
+      element.classList.toggle(CONFIG.CSS_CLASSES.WORD_HIDDEN, !isSelected);
     });
-    
-    this.wordElements = this.wordListElement.querySelectorAll(CONFIG.SELECTORS.WORD_ELEMENTS);
   }
   
   reapplySelectionState() {
@@ -378,14 +393,16 @@ export class WordManager {
     };
   }
   
-  cleanup() {
-    this.wordElements.forEach(element => {
-      element.removeEventListener('click', () => {});
-      element.removeEventListener('keydown', () => {});
+   cleanup() {
+    // ✅ Nettoyage propre et efficace
+    this.eventHandlers.forEach((handlers, element) => {
+      element.removeEventListener('click', handlers.click);
+      element.removeEventListener('keydown', handlers.keydown);
     });
+    this.eventHandlers.clear();
     
-    document.removeEventListener('keydown', () => {});
-    document.removeEventListener('ordinationChanged', () => {});
+    document.removeEventListener('keydown', this.globalKeydownHandler);
+    document.removeEventListener('ordinationChanged', this.ordinationChangedHandler);
     
     this.selectedWords.clear();
     this.wordElements = [];

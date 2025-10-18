@@ -28,6 +28,8 @@ export class NotificationManager {
    * @private
    */
   static currentNotification = null;
+  static queue = [];
+  static notificationElements = new WeakMap(); // Pour éviter les fuites mémoire
   
   /**
    * Affiche une notification à l'utilisateur

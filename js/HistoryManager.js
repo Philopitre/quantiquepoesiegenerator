@@ -6,6 +6,7 @@
 
 import { CONFIG } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
+import { safeLocalStorageGet } from './config.js';
 
 export class HistoryManager {
   constructor() {
@@ -27,30 +28,17 @@ export class HistoryManager {
   }
   
   loadHistory() {
-    try {
-      const data = localStorage.getItem(CONFIG.STORAGE.HISTORY_KEY);
-      const parsed = data ? JSON.parse(data) : [];
-      const validated = Array.isArray(parsed) ? parsed.filter(this.isValidHistoryEntry) : [];
-      
-      if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
-        console.log('Historique chargé:', { validated: validated.length });
-      }
-      
-      return validated;
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error);
-      return [];
-    }
-  }
+  return safeLocalStorageGet(CONFIG.STORAGE.HISTORY_KEY, []);
+}
   
   isValidHistoryEntry(entry) {
     return entry &&
-           typeof entry === 'object' &&
-           typeof entry.text === 'string' &&
-           entry.text.length > 0 &&
-           typeof entry.note === 'number' &&
-           entry.note >= CONFIG.LIMITS.MIN_RATING &&
-           entry.note <= CONFIG.LIMITS.MAX_RATING;
+          typeof entry === 'object' &&
+          typeof entry.text === 'string' &&
+          entry.text.length > 0 &&
+          typeof entry.note === 'number' &&
+          entry.note >= CONFIG.LIMITS.MIN_RATING &&
+          entry.note <= CONFIG.LIMITS.MAX_RATING;
   }
   
   validateHistoryData() {

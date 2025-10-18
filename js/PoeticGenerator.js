@@ -42,25 +42,25 @@ export class PoeticGenerator {
    * Initialise tous les modules dans l'ordre correct
    * @private
    */
-  async init() {
-    try {
-      // Phase 1: Modules indépendants
-      await this.initializeIndependentModules();
-      
-      // Phase 2: Modules avec dépendances simples
-      await this.initializeDependentModules();
-      
-      // Phase 3: Modules avec références circulaires
-      await this.initializeCircularDependencies();
-      
-      // Phase 4: Configuration finale
-      await this.finalizeDependencies();
-      
-      // Phase 5: Event listeners globaux
-      this.setupGlobalEventListeners();
-      
-      // Phase 6: Raccourcis clavier
-      this.setupKeyboardShortcuts();
+  init() {
+  try {
+    // Phase 1: Modules indépendants
+    this.initializeIndependentModules();
+    
+    // Phase 2: Modules avec dépendances simples
+    this.initializeDependentModules();
+    
+    // Phase 3: Modules avec références circulaires
+    this.initializeCircularDependencies();
+    
+    // Phase 4: Configuration finale
+    this.finalizeDependencies();
+    
+    // Phase 5: Event listeners globaux
+    this.setupGlobalEventListeners();
+    
+    // Phase 6: Raccourcis clavier
+    this.setupKeyboardShortcuts();
       
       this.isInitialized = true;
       
@@ -152,42 +152,66 @@ export class PoeticGenerator {
    * @private
    */
   setupGlobalEventListeners() {
-    const buttons = [
-      { id: CONFIG.DOM_ELEMENTS.RESET_ALL_WORDS, handler: () => this.managers.word.resetAllWords() },
-      { id: CONFIG.DOM_ELEMENTS.TOGGLE_SOUND, handler: () => this.managers.audio.toggleSound() },
-      { id: CONFIG.DOM_ELEMENTS.GENERATE_BTN, handler: () => this.managers.combination.generate() },
-      { id: CONFIG.DOM_ELEMENTS.GENERATE_SELECTED_BTN, handler: () => this.managers.combination.generate(true) },
-      { id: CONFIG.DOM_ELEMENTS.NEW_COMBINATION_BTN, handler: () => this.managers.combination.generate() },
-      { id: CONFIG.DOM_ELEMENTS.COPY_BTN, handler: () => this.managers.share.copyToClipboard() },
-      { id: CONFIG.DOM_ELEMENTS.SUBMIT_RATING, handler: () => this.managers.rating.submitRating() },
-      { id: CONFIG.DOM_ELEMENTS.SHARE_TWITTER, handler: () => this.managers.share.shareOnTwitter() },
-      { id: CONFIG.DOM_ELEMENTS.SHARE_WHATSAPP, handler: () => this.managers.share.shareOnWhatsApp() },
-      { id: CONFIG.DOM_ELEMENTS.SHARE_FACEBOOK, handler: () => this.managers.share.shareOnFacebook() },
-      { id: CONFIG.DOM_ELEMENTS.SHARE_EMAIL, handler: () => this.managers.share.shareByEmail() },
-      { id: CONFIG.DOM_ELEMENTS.GENERATE_IMAGE, handler: () => this.managers.share.generateImage() },
-      { id: CONFIG.DOM_ELEMENTS.SORT_UP, handler: () => this.managers.history.sortByRating(true) },
-      { id: CONFIG.DOM_ELEMENTS.SORT_DOWN, handler: () => this.managers.history.sortByRating(false) },
-      { id: CONFIG.DOM_ELEMENTS.RANDOM_SORT, handler: () => this.managers.history.randomSort() },
-      { id: CONFIG.DOM_ELEMENTS.EXPORT_TXT, handler: () => this.managers.history.exportTXT() },
-      { id: CONFIG.DOM_ELEMENTS.EXPORT_PDF, handler: () => this.managers.history.exportPDF() },
-      { id: CONFIG.DOM_ELEMENTS.RESET_CACHE, handler: () => this.handleResetCache() }
-    ];
+  // Map des actions par ID de bouton
+  const actionMap = {
+    [CONFIG.DOM_ELEMENTS.RESET_ALL_WORDS]: () => this.managers.word.resetAllWords(),
+    [CONFIG.DOM_ELEMENTS.TOGGLE_SOUND]: () => this.managers.audio.toggleSound(),
+    [CONFIG.DOM_ELEMENTS.GENERATE_BTN]: () => this.managers.combination.generate(),
+    [CONFIG.DOM_ELEMENTS.GENERATE_SELECTED_BTN]: () => this.managers.combination.generate(true),
+    [CONFIG.DOM_ELEMENTS.NEW_COMBINATION_BTN]: () => this.managers.combination.generate(),
+    [CONFIG.DOM_ELEMENTS.COPY_BTN]: () => this.managers.share.copyToClipboard(),
+    [CONFIG.DOM_ELEMENTS.SUBMIT_RATING]: () => this.managers.rating.submitRating(),
+    [CONFIG.DOM_ELEMENTS.SHARE_TWITTER]: () => this.managers.share.shareOnTwitter(),
+    [CONFIG.DOM_ELEMENTS.SHARE_WHATSAPP]: () => this.managers.share.shareOnWhatsApp(),
+    [CONFIG.DOM_ELEMENTS.SHARE_FACEBOOK]: () => this.managers.share.shareOnFacebook(),
+    [CONFIG.DOM_ELEMENTS.SHARE_EMAIL]: () => this.managers.share.shareByEmail(),
+    [CONFIG.DOM_ELEMENTS.GENERATE_IMAGE]: () => this.managers.share.generateImage(),
+    [CONFIG.DOM_ELEMENTS.SORT_UP]: () => this.managers.history.sortByRating(true),
+    [CONFIG.DOM_ELEMENTS.SORT_DOWN]: () => this.managers.history.sortByRating(false),
+    [CONFIG.DOM_ELEMENTS.RANDOM_SORT]: () => this.managers.history.randomSort(),
+    [CONFIG.DOM_ELEMENTS.EXPORT_TXT]: () => this.managers.history.exportTXT(),
+    [CONFIG.DOM_ELEMENTS.EXPORT_PDF]: () => this.managers.history.exportPDF(),
+    [CONFIG.DOM_ELEMENTS.RESET_CACHE]: () => this.handleResetCache()
+  };
+  
+  // Event listener avec delegation - MAIS on évite les mots !
+  const globalClickHandler = (event) => {
+    const target = event.target;
     
-    buttons.forEach(({ id, handler }) => {
-      const element = document.getElementById(id);
-      if (element) {
-        const wrappedHandler = this.createSafeEventHandler(handler, id);
-        element.addEventListener('click', wrappedHandler);
-        this.eventListeners.set(id, { element, handler: wrappedHandler });
-      } else if (CONFIG.DEBUG.ENABLED) {
-        console.warn(`PoeticGenerator: Élément non trouvé: ${id}`);
-      }
-    });
-    
-    if (CONFIG.DEBUG.ENABLED) {
-      console.log(`PoeticGenerator: ${this.eventListeners.size} event listeners configurés`);
+    // ⚠️ NE PAS intercepter les clics sur les mots (gérés par WordManager)
+    if (target.classList.contains('word-group-1') || 
+        target.classList.contains('word-group-2') ||
+        target.closest('.full-word-list')) {
+      return; // Laisser WordManager gérer
     }
+    
+    // Chercher le bouton cliqué
+    const button = target.closest('button, [role="button"]');
+    if (!button || !button.id) return;
+    
+    const handler = actionMap[button.id];
+    if (handler) {
+      event.preventDefault();
+      
+      try {
+        if (CONFIG.DEBUG.ENABLED) {
+          console.log(`PoeticGenerator: Action déclenchée: ${button.id}`);
+        }
+        handler();
+      } catch (error) {
+        console.error(`PoeticGenerator: Erreur dans ${button.id}:`, error);
+        NotificationManager.error('Une erreur est survenue. Veuillez réessayer.');
+      }
+    }
+  };
+  
+  document.addEventListener('click', globalClickHandler);
+  this.eventListeners.set('global-click', { element: document, handler: globalClickHandler, type: 'click' });
+  
+  if (CONFIG.DEBUG.ENABLED) {
+    console.log(`PoeticGenerator: Event delegation configuré pour ${Object.keys(actionMap).length} actions`);
   }
+}
   
   /**
    * Gère la réinitialisation du cache
