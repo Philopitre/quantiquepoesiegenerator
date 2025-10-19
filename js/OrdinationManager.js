@@ -4,7 +4,7 @@
  * @module OrdinationManager
  */
 
-import { CONFIG } from './config.js';
+import { CONFIG, safeLocalStorageGet, safeLocalStorageSet } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
 
 /**
@@ -158,37 +158,39 @@ export class OrdinationManager {
    * @private
    */
   loadSavedOrdination() {
-    try {
-      const saved = localStorage.getItem('poeticOrdination');
-      if (saved && ['original', 'alternative'].includes(saved)) {
-        this.currentOrdination = saved;
-      }
-      
-      this.applyOrdination(this.currentOrdination, false);
-      
-      if (CONFIG.DEBUG.ENABLED) {
-        console.log('OrdinationManager: Ordination chargée:', this.currentOrdination);
-      }
-    } catch (error) {
-      console.error('OrdinationManager: Erreur lors du chargement:', error);
-    }
+  const saved = safeLocalStorageGet(CONFIG.STORAGE.ORDINATION_KEY, 'original');
+  
+  if (['original', 'alternative'].includes(saved)) {
+    this.currentOrdination = saved;
+  } else {
+    this.currentOrdination = 'original';
   }
+  
+  this.applyOrdination(this.currentOrdination, false);
+  
+  if (CONFIG.DEBUG.ENABLED) {
+    console.log('OrdinationManager: Ordination chargée:', this.currentOrdination);
+  }
+}
   
   /**
    * Sauvegarde l'ordination courante
    * @private
    */
   saveOrdination() {
-    try {
-      localStorage.setItem('poeticOrdination', this.currentOrdination);
-      
-      if (CONFIG.DEBUG.ENABLED) {
-        console.log('OrdinationManager: Ordination sauvegardée:', this.currentOrdination);
-      }
-    } catch (error) {
-      console.error('OrdinationManager: Erreur lors de la sauvegarde:', error);
-    }
+    const success = safeLocalStorageSet(
+    CONFIG.STORAGE.ORDINATION_KEY, 
+    this.currentOrdination
+  );
+  
+  if (CONFIG.DEBUG.ENABLED) {
+    console.log(
+      'OrdinationManager: Ordination sauvegardée:', 
+      this.currentOrdination,
+      success ? '✓' : '✗'
+    );
   }
+}
   
   /**
    * Bascule entre les ordinations

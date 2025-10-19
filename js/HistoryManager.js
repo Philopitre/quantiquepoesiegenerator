@@ -4,9 +4,9 @@
  * @module HistoryManager
  */
 
-import { CONFIG } from './config.js';
+import { CONFIG, safeLocalStorageGet, safeLocalStorageSet } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
-import { safeLocalStorageGet } from './config.js';
+
 
 export class HistoryManager {
   constructor() {
@@ -28,8 +28,15 @@ export class HistoryManager {
   }
   
   loadHistory() {
-  return safeLocalStorageGet(CONFIG.STORAGE.HISTORY_KEY, []);
-}
+    const data = safeLocalStorageGet(CONFIG.STORAGE.HISTORY_KEY, []);
+    const validated = Array.isArray(data) ? data.filter(this.isValidHistoryEntry) : [];
+    
+    if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
+      console.log('Historique chargé:', { validated: validated.length });
+    }
+    
+    return validated;
+  }
   
   isValidHistoryEntry(entry) {
     return entry &&
@@ -56,16 +63,15 @@ export class HistoryManager {
   }
   
   saveHistory() {
-    try {
-      const data = JSON.stringify(this.history);
-      localStorage.setItem(CONFIG.STORAGE.HISTORY_KEY, data);
-      
-      if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
-        console.log('Historique sauvegardé:', { entries: this.history.length });
-      }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+    const success = safeLocalStorageSet(CONFIG.STORAGE.HISTORY_KEY, this.history);
+    
+    if (!success) {
       NotificationManager.error('Erreur lors de la sauvegarde de l\'historique');
+      return;
+    }
+    
+    if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
+      console.log('Historique sauvegardé:', { entries: this.history.length });
     }
   }
   

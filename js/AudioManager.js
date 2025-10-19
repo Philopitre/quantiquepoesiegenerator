@@ -4,9 +4,8 @@
  * @module AudioManager
  */
 
-import { CONFIG } from './config.js';
+import { CONFIG, safeLocalStorageGet, safeLocalStorageSet } from './config.js';
 import { NotificationManager } from './NotificationManager.js';
-import { safeLocalStorageGet } from './config.js';
 
 export class AudioManager {
   constructor() {
@@ -86,17 +85,14 @@ export class AudioManager {
   }
   
   loadSoundPreference() {
-  return safeLocalStorageGet(CONFIG.STORAGE.SOUND_KEY, true);
-}
+    return safeLocalStorageGet(CONFIG.STORAGE.SOUND_KEY, true);
+  }
   
   saveSoundPreference() {
-    try {
-      localStorage.setItem(CONFIG.STORAGE.SOUND_KEY, JSON.stringify(this.soundEnabled));
-      if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
-        console.log('Préférences sauvegardées:', this.soundEnabled);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+    safeLocalStorageSet(CONFIG.STORAGE.SOUND_KEY, this.soundEnabled);
+    
+    if (CONFIG.DEBUG.ENABLED && CONFIG.DEBUG.LOG_STORAGE) {
+      console.log('Préférences sauvegardées:', this.soundEnabled);
     }
   }
   
