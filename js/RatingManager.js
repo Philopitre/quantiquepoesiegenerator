@@ -92,10 +92,14 @@ export class RatingManager {
   }
   
   handleRatingChange(event) {
-    if (!this.isCombinationReadyForRating()) {
-      this.preventRatingAndNotify(event);
-      return;
-    }
+  // ✨ Réutiliser le helper !
+  if (!this.validateCondition(
+    this.isCombinationReadyForRating(),
+    CONFIG.MESSAGES.GENERATION_NOT_COMPLETE
+  )) {
+    event.target.checked = false;
+    return;
+  }
     
     const selectedRating = parseInt(event.target.value);
     
@@ -262,25 +266,26 @@ export class RatingManager {
     }
   }
   
-  validateSubmissionConditions() {
-    if (!this.isCombinationReadyForRating()) {
-      NotificationManager.warning(CONFIG.MESSAGES.GENERATION_NOT_FINISHED);
+  validateCondition(isValid, errorMessage) {
+    if (!isValid) {
+      NotificationManager.warning(errorMessage);
       return false;
     }
-    
-    const selectedRating = this.getCurrentSelectedRating();
-    if (!selectedRating) {
-      NotificationManager.warning(CONFIG.MESSAGES.CHOOSE_RATING);
-      return false;
-    }
-    
-    if (!this.isRatingEnabled) {
-      NotificationManager.warning('Le système de notation n\'est pas activé');
-      return false;
-    }
-    
     return true;
   }
+  
+  validateSubmissionConditions() {
+    return this.validateCondition(
+      this.isCombinationReadyForRating(),
+      CONFIG.MESSAGES.GENERATION_NOT_FINISHED
+    ) && this.validateCondition(
+      this.getCurrentSelectedRating(),
+      CONFIG.MESSAGES.CHOOSE_RATING
+    ) && this.validateCondition(
+      this.isRatingEnabled,
+      'Le système de notation n\'est pas activé'
+  );
+}
   
   getCurrentSelectedRating() {
     const selectedInput = document.querySelector(CONFIG.DOM_ELEMENTS.RATING_CHECKED);
