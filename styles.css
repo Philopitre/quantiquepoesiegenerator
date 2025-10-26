@@ -253,6 +253,7 @@ h3 {
   margin-top: 30px;
 }
 
+/* ✅ CORRECTION : Structure de carte avec hauteur égale */
 .tool-card {
   background: linear-gradient(135deg, var(--white) 0%, var(--cream) 100%);
   padding: 30px;
@@ -261,6 +262,12 @@ h3 {
   border: 2px solid var(--sage);
   transition: var(--transition);
   text-align: center;
+
+  /* ✅ Flexbox pour contrôler l'alignement */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 400px;
 }
 
 .tool-card:hover {
@@ -272,6 +279,13 @@ h3 {
 .tool-card.coming-soon {
   opacity: 0.7;
   background: linear-gradient(135deg, var(--sand) 0%, var(--cream) 100%);
+}
+
+/* ✅ CORRECTION : Conteneur de contenu flexible */
+.tool-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .tool-icon {
@@ -289,8 +303,11 @@ h3 {
   color: var(--text-color);
   line-height: 1.6;
   margin-bottom: 20px;
+  flex: 1;
+  /* ✅ Prend l'espace disponible */
 }
 
+/* ✅ CORRECTION : Bouton toujours en bas */
 .tool-link {
   display: inline-block;
   padding: 12px 24px;
@@ -301,6 +318,8 @@ h3 {
   font-weight: 600;
   transition: var(--transition);
   box-shadow: 0 4px 12px rgba(231, 111, 81, 0.3);
+  margin-top: auto;
+  /* ✅ Force le bouton en bas */
 }
 
 .tool-link:hover {
@@ -308,7 +327,38 @@ h3 {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(231, 111, 81, 0.4);
 }
+/* ===================================
+   RESPONSIVE : Ajustements mobile
+   =================================== */
 
+@media (max-width: 768px) {
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-card {
+    min-height: auto;
+    /* Pas de hauteur minimale sur mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-icon {
+    font-size: 2.5rem;
+  }
+
+  .tool-card {
+    padding: 20px;
+  }
+
+  .tool-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .tool-card p {
+    font-size: 0.9rem;
+  }
+}
 /* ===================================
    CLASSES UTILITAIRES
    =================================== */
@@ -1559,7 +1609,40 @@ footer {
   background-color: var(--accent-color);
   color: white;
 }
+/* ===================================
+   CURIEUX VISITEURS
+   =================================== */
+.visitor-counter {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  color: var(--forest);
+  opacity: 0.85;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  font-style: italic;
+  letter-spacing: 0.3px;
+  transition: opacity 0.5s ease;
+}
 
+.visitor-counter span:first-child {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.visitor-counter:hover {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .visitor-counter {
+    font-size: 0.85rem;
+    gap: 5px;
+  }
+}
 /* ===================================
    FIN DU FICHIER CSS
    =================================== */
